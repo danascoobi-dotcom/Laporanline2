@@ -65,7 +65,6 @@
       </div>
     </div>
 
-    <!-- LINE 2 -->
     <div class="card">
       <h3>LINE 2</h3>
       <div class="grid-3">
@@ -93,7 +92,6 @@
       </div>
     </div>
 
-    <!-- LINE 3 -->
     <div class="card">
       <h3>LINE 3</h3>
       <div class="grid-3">
@@ -121,7 +119,6 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <div class="card">
       <div class="grid-2">
         <div><label>Pulp Standby Tank 203</label><input type="number" id="pulp203"></div>
@@ -130,73 +127,198 @@
     </div>
 
     <div class="grid-2">
-      <button class="btn" onclick="previewLaporan()">Tampilkan Laporan</button>
+      <button class="btn" onclick="previewLaporan()">Tampilkan & Simpan Laporan</button>
       <button class="btn secondary" onclick="copyText()">Salin Teks</button>
       <button class="btn ghost" onclick="shareWA()">Kirim WA</button>
-      <button class="btn ghost" onclick="exportCSV()">Export CSV</button>
-      <button class="btn ghost" onclick="window.print()">Print/PDF</button>
-      <button class="btn danger" onclick="clearData()">Bersihkan Data</button>
+      <button class="btn danger" onclick="clearData()">Bersihkan Form</button>
       <button class="btn ghost" onclick="toggleTheme()">🌙 Mode</button>
     </div>
 
     <pre id="output"></pre>
   </div>
+
+  <div class="card" style="margin-top: 24px;">
+    <h3>📋 Laporan Tersimpan (Real-time)</h3>
+    <div class="grid-3">
+      <div>
+        <label>Filter Tanggal</label>
+        <input type="date" id="filterTanggal" onchange="renderLaporan()">
+      </div>
+      <div>
+        <label>Filter Shift</label>
+        <select id="filterShift" onchange="renderLaporan()">
+          <option value="">Semua Shift</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+        </select>
+      </div>
+    </div>
+    <div id="laporanList" style="margin-top: 16px; display: grid; gap: 12px;">
+      <p class="muted">Memuat laporan dari server...</p>
+    </div>
+  </div>
 </div>
 
-<script>
-const BOBIN_PER_MR = 6, KG_PER_BOBIN = 15, SPEED = 15, WIDTH = 1.2, GSM = 0.095, TIME = 480;
-const THEORETICAL_KG = SPEED*WIDTH*GSM*TIME;
-const nf = new Intl.NumberFormat('id-ID',{maximumFractionDigits:2});
-function g(id){let e=document.getElementById(id); return e&&e.value!==''?e.value:''}
-function n(id){return parseFloat(g(id))||0}
-function isFilled(ids){return ids.some(id=>g(id)!=='')}
-function calcOEE(line){
-  let totalMR=n(`slit_mr${line}`)*BOBIN_PER_MR, reject=n(`reject_produksi${line}`);
-  let oke=Math.max(totalMR-reject,0)*KG_PER_BOBIN;
-  return oke<=0?null:(oke/THEORETICAL_KG)*100
-}
-function updateOEE(line){
-  let oee=calcOEE(line), el=document.getElementById(`oee${line}`), bar=document.getElementById(`bar${line}`);
-  el.textContent=oee===null?'-':nf.format(oee)+'%';
-  bar.style.width=oee?Math.min(oee,100)+'%':'0%';
-  let prev=parseFloat(localStorage.getItem(`oeePrev${line}`)||'NaN');
-  document.getElementById(`delta${line}`).textContent=isNaN(prev)||oee===null?'':`(${oee-prev>=0?'+':''}${nf.format(oee-prev)}% dari terakhir)`;
-  if(oee!==null)localStorage.setItem(`oeePrev${line}`,oee);
-}
-["2","3"].forEach(l=>["slit_mr","reject_produksi"].forEach(k=>{
-  let e=document.getElementById(`${k}${l}`); if(e)e.addEventListener("input",()=>updateOEE(l))
-}));
-function narasi(no,ids){
-  let [pulp,vitA,vitB,vitS,adhS,adhT,cmc,rec,recw,mr,fg,slit_mr,rp,rn,total]=ids, t=`\n\n---\n\nLINE ${no}\n\nPersiapan Produksi:\n`;
-  if(g(pulp))t+=`- Pulp Tank: ${g(pulp)} set\n`; if(g(vitA))t+=`- Vitacel A: ${g(vitA)} set\n`; if(g(vitB))t+=`- Vitacel B: ${g(vitB)} set\n`;
-  if(g(vitS))t+=`- Vitacel Standby: ${g(vitS)} set\n`; if(g(adhS))t+=`- Adhesive Standby: ${g(adhS)} set\n`; if(g(adhT))t+=`- Adhesive Tangki: ${g(adhT)} set\n`;
-  if(g(cmc))t+=`- CMC: ${g(cmc)} set\n`; if(g(rec)&&g(recw))t+=`- Recycle: ${g(rec)} set (${g(recw)} kg/set)\n`;
-  t+=`\nFinish Good:\n`; if(g(mr))t+=`- Mother Roll: ${g(mr)} MR\n`; if(g(fg))t+=`- Berat FG: ${g(fg)} kg\n`;
-  let totalBobin=n(slit_mr)*BOBIN_PER_MR, rej=n(rp), rejNCP=n(rn), totalManual=n(total);
-  let oke=Math.max(totalBobin-rej,0), okeKg=oke*KG_PER_BOBIN;
-  t+=`\nSlitting:\n- Slitting: ${totalBobin} bobin\n- Reject Produksi: ${rej} bobin\n- OKE: ${oke} bobin (${okeKg} kg)\n- Reject NCP: ${rejNCP} bobin\n- Total Manual: ${totalManual} bobin (${totalManual*KG_PER_BOBIN} kg)\n`;
-  t+=`\n📈 OEE: ${nf.format(calcOEE(no)||0)}%\n`; return t;
-}
-function previewLaporan(){
-  let isi=`LAPORAN SHIFT ${g('shift')}\nTanggal: ${g('tanggal')}\nProduk: ${g('produk')}`;
-  let l2=['pulp205_2','vit2a','vit2b','vit2s','adh2s','adh2t','cmc2','rec2','rec2w','mr2','fg2','slit_mr2','reject_produksi2','reject_ncp2','total_bobin_manual2'];
-  let l3=['pulp204_3','vit3a','vit3b','vit3s','adh3s','adh3t','cmc3','rec3','rec3w','mr3','fg3','slit_mr3','reject_produksi3','reject_ncp3','total_bobin_manual3'];
-  if(isFilled(l2))isi+=narasi(2,l2); if(isFilled(l3))isi+=narasi(3,l3);
-  if(g('pulp203')||g('catatan')){isi+=`\n\nCatatan:\n`; if(g('pulp203'))isi+=`- Pulp 203: ${g('pulp203')} set\n`; if(g('catatan'))isi+=`- ${g('catatan')}\n`}
-  document.getElementById('output').innerText=isi; updateOEE(2); updateOEE(3); saveData();
-}
-function copyText(){let t=document.getElementById('output').innerText; if(!t.trim())return alert('Kosong'); navigator.clipboard.writeText(t).then(()=>alert('Disalin'))}
-function shareWA(){let t=document.getElementById('output').innerText||''; if(!t)previewLaporan(); window.open(`https://wa.me/?text=${encodeURIComponent(t)}`,'_blank')}
-function exportCSV(){
-  let rows=[['Field','Value']]; document.querySelectorAll('input,textarea').forEach(el=>rows.push([el.id,el.value]));
-  let csv=rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
-  let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='laporan.csv'; a.click();
-}
-function clearData(){if(!confirm('Hapus semua data?'))return; document.querySelectorAll('input,textarea').forEach(el=>el.value=''); localStorage.clear(); document.getElementById('output').innerText=''}
-function toggleTheme(){document.body.classList.toggle('dark'); localStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light')}
-function saveData(){let d={}; document.querySelectorAll('input,textarea').forEach(el=>d[el.id]=el.value); localStorage.setItem('formData',JSON.stringify(d))}
-function restore(){let d=JSON.parse(localStorage.getItem('formData')||'{}'); Object.keys(d).forEach(k=>{let el=document.getElementById(k); if(el)el.value=d[k]}); if(localStorage.getItem('theme')==='dark')document.body.classList.add('dark')}
-restore();
+<script type="module">
+  // Impor fungsi yang diperlukan dari Firebase SDK
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+  // =================================================================================
+  // KONFIGURASI DARI FILE HTML PERTAMA ANDA
+  // =================================================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyCReZ1Hs1p63Sq6DWODvwbKCgpVPUzVKQA",
+    authDomain: "laporanharian-d689c.firebaseapp.com",
+    databaseURL: "https://laporanharian-d689c-default-rtdb.firebaseio.com",
+    projectId: "laporanharian-d689c",
+    storageBucket: "laporanharian-d689c.appspot.com",
+    messagingSenderId: "161606001787",
+    appId: "1:161606001787:web:a2550a1abf208ce188aede",
+    measurementId: "G-E9SL4RT4TB"
+  };
+  // =================================================================================
+
+  // Inisialisasi Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let semuaLaporan = {};
+
+  // --- Konstanta dan Fungsi Helper ---
+  const BOBIN_PER_MR = 6, KG_PER_BOBIN = 15, SPEED = 15, WIDTH = 1.2, GSM = 0.095, TIME = 480;
+  const THEORETICAL_KG = SPEED*WIDTH*GSM*TIME;
+  const nf = new Intl.NumberFormat('id-ID',{maximumFractionDigits:2});
+  function g(id){let e=document.getElementById(id); return e&&e.value!==''?e.value:''}
+  function n(id){return parseFloat(g(id))||0}
+  function isFilled(data, keys){return keys.some(key=>data[key])}
+
+  // --- Fungsi OEE ---
+  function calcOEE(line, data){
+    let totalMR= (parseFloat(data[`slit_mr${line}`]) || 0) * BOBIN_PER_MR;
+    let reject = parseFloat(data[`reject_produksi${line}`]) || 0;
+    let oke=Math.max(totalMR-reject,0)*KG_PER_BOBIN;
+    return oke<=0? 0 :(oke/THEORETICAL_KG)*100
+  }
+  function updateOEEPreview(line, data){
+    let oee = calcOEE(line, data);
+    document.getElementById(`oee${line}`).textContent=nf.format(oee)+'%';
+    document.getElementById(`bar${line}`).style.width=Math.min(oee,100)+'%';
+  }
+
+  // --- Fungsi Narasi Laporan ---
+  function narasi(no, data){
+    let t=`\n\n---\n\nLINE ${no}\n\nPersiapan Produksi:\n`;
+    if(data[`pulp205_${no}`] || data[`pulp204_${no}`]) t+=`- Pulp Tank: ${data[`pulp205_${no}`] || data[`pulp204_${no}`]} set\n`;
+    if(data[`vit${no}a`]) t+=`- Vitacel A: ${data[`vit${no}a`]} set\n`;
+    if(data[`vit${no}b`]) t+=`- Vitacel B: ${data[`vit${no}b`]} set\n`;
+    if(data[`vit${no}s`]) t+=`- Vitacel Standby: ${data[`vit${no}s`]} set\n`;
+    if(data[`adh${no}s`]) t+=`- Adhesive Standby: ${data[`adh${no}s`]} set\n`;
+    if(data[`adh${no}t`]) t+=`- Adhesive Tangki: ${data[`adh${no}t`]} set\n`;
+    if(data[`cmc${no}`]) t+=`- CMC: ${data[`cmc${no}`]} set\n`;
+    if(data[`rec${no}`] && data[`rec${no}w`]) t+=`- Recycle: ${data[`rec${no}`]} set (${data[`rec${no}w`]} kg/set)\n`;
+    t+=`\nFinish Good:\n`; if(data[`mr${no}`]) t+=`- Mother Roll: ${data[`mr${no}`]} MR\n`; if(data[`fg${no}`]) t+=`- Berat FG: ${data[`fg${no}`]} kg\n`;
+    
+    const slit_mr = n(`slit_mr${no}`), rp = n(`reject_produksi${no}`), rn = n(`reject_ncp${no}`), totalManual = n(`total_bobin_manual${no}`);
+    let totalBobin=slit_mr*BOBIN_PER_MR, oke=Math.max(totalBobin-rp,0), okeKg=oke*KG_PER_BOBIN;
+    
+    t+=`\nSlitting:\n- Slitting: ${totalBobin} bobin\n- Reject Produksi: ${rp} bobin\n- OKE: ${oke} bobin (${okeKg} kg)\n- Reject NCP: ${rn} bobin\n- Total Manual: ${totalManual} bobin (${totalManual*KG_PER_BOBIN} kg)\n`;
+    t+=`\n📈 OEE: ${nf.format(calcOEE(no, data))}%\n`; return t;
+  }
+
+  // --- Fungsi Utama ---
+  window.previewLaporan = function(){
+    let dataLaporan = {};
+    document.querySelectorAll('input,textarea,select').forEach(el => dataLaporan[el.id] = el.value);
+
+    let isi=`LAPORAN SHIFT ${dataLaporan.shift}\nTanggal: ${dataLaporan.tanggal}\nProduk: ${dataLaporan.produk}`;
+    if(isFilled(dataLaporan, ['pulp205_2', 'vit2a', 'mr2'])) isi += narasi(2, dataLaporan);
+    if(isFilled(dataLaporan, ['pulp204_3', 'vit3a', 'mr3'])) isi += narasi(3, dataLaporan);
+    if(dataLaporan.pulp203 || dataLaporan.catatan){
+      isi+=`\n\nCatatan Tambahan:\n`; 
+      if(dataLaporan.pulp203) isi+=`- Pulp 203: ${dataLaporan.pulp203} set\n`; 
+      if(dataLaporan.catatan) isi+=`- ${dataLaporan.catatan}\n`;
+    }
+    document.getElementById('output').innerText=isi;
+    updateOEEPreview(2, dataLaporan);
+    updateOEEPreview(3, dataLaporan);
+    saveDataLocal(); // Simpan ke localstorage untuk draft
+    saveDataToFirebase(dataLaporan, isi); // Simpan ke server
+  }
+
+  function saveDataToFirebase(data, teksLaporan) {
+    const tanggal = data.tanggal;
+    if (!tanggal) {
+      alert("⚠️ Tanggal wajib diisi untuk menyimpan laporan ke server!");
+      return;
+    }
+    const laporanRef = ref(db, "laporan/" + tanggal);
+    const newLaporanRef = push(laporanRef);
+    set(newLaporanRef, {
+      formData: data,
+      teks: teksLaporan,
+      waktu: new Date().toISOString()
+    })
+    .then(() => alert("✅ Laporan berhasil disimpan ke server!"))
+    .catch((error) => {
+      console.error("Gagal menyimpan:", error);
+      alert("❌ Gagal menyimpan laporan ke server.");
+    });
+  }
+
+  // --- Fungsi untuk Menampilkan Data Real-time ---
+  const laporanListEl = document.getElementById('laporanList');
+  window.renderLaporan = function() {
+      const filterTanggal = g('filterTanggal');
+      const filterShift = g('filterShift');
+      laporanListEl.innerHTML = '';
+
+      const dataUrut = Object.entries(semuaLaporan).sort((a,b) => b[0].localeCompare(a[0]));
+      
+      let adaLaporan = false;
+      for (const [tanggal, laporanPerTanggal] of dataUrut) {
+          if (filterTanggal && tanggal !== filterTanggal) continue;
+
+          for (const item of Object.values(laporanPerTanggal).reverse()) {
+              if (filterShift && item.formData.shift !== filterShift) continue;
+              
+              adaLaporan = true;
+              const card = document.createElement('div');
+              card.className = 'card';
+              card.innerHTML = `
+                  <p class="muted"><strong>${tanggal} - Shift ${item.formData.shift}</strong> | ${new Date(item.waktu).toLocaleTimeString('id-ID')}</p>
+                  <pre style="white-space: pre-wrap; font-size: 13px;">${item.teks}</pre>
+              `;
+              laporanListEl.appendChild(card);
+          }
+      }
+      if (!adaLaporan) {
+          laporanListEl.innerHTML = '<p class="muted">Tidak ada laporan yang sesuai dengan filter.</p>';
+      }
+  }
+
+  // Listener utama untuk data real-time dari Firebase
+  onValue(ref(db, 'laporan'), (snapshot) => {
+      semuaLaporan = snapshot.val() || {};
+      renderLaporan();
+  });
+
+  // --- Fungsi Utilitas Lainnya ---
+  window.copyText = function(){let t=document.getElementById('output').innerText; if(!t.trim()){alert('Laporan kosong!'); return;} navigator.clipboard.writeText(t).then(()=>alert('📋 Laporan disalin ke clipboard'))}
+  window.shareWA = function(){let t=document.getElementById('output').innerText||''; if(!t.trim()){window.previewLaporan(); t=document.getElementById('output').innerText;} window.open(`https://wa.me/?text=${encodeURIComponent(t)}`,'_blank')}
+  window.clearData = function(){if(!confirm('Hapus semua data di form? (Data di server tidak akan terhapus)'))return; document.querySelectorAll('input,textarea,select').forEach(el=>el.value=''); localStorage.removeItem('formData'); document.getElementById('output').innerText=''}
+  window.toggleTheme = function(){document.body.classList.toggle('dark'); localStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light')}
+
+  function saveDataLocal(){let d={}; document.querySelectorAll('input,textarea,select').forEach(el=>d[el.id]=el.value); localStorage.setItem('formData',JSON.stringify(d))}
+  function restore(){
+    let d=JSON.parse(localStorage.getItem('formData')||'{}'); 
+    Object.keys(d).forEach(k=>{let el=document.getElementById(k); if(el)el.value=d[k]}); 
+    if(localStorage.getItem('theme')==='dark')document.body.classList.add('dark');
+    document.getElementById('tanggal').valueAsDate = new Date();
+  }
+  restore();
+
 </script>
 </body>
 </html>
