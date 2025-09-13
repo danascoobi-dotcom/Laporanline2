@@ -1,491 +1,144 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Laporan Harian Produksi — Draft Panjang</title>
-<style>
-  :root{--bg:#f6f7f9;--card:#fff;--muted:#6b7280;--accent:#06b6d4;--danger:#ef4444;}
-  body{font-family:system-ui,Arial;background:var(--bg);margin:0;color:#0f172a}
-  .wrap{max-width:1000px;margin:28px auto;padding:20px}
-  h1{margin:0 0 8px;font-size:20px}
-  .card{background:var(--card);border-radius:10px;padding:14px;border:1px solid #e6eef3;box-shadow:0 2px 6px rgba(2,6,23,.04);margin-bottom:14px}
-  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:880px){.grid-3{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:560px){.grid-3,.grid-2{grid-template-columns:1fr}}
-  label{display:block;font-weight:600;margin-bottom:6px}
-  input[type="number"],input[type="date"],input[type="text"],select,textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eef3;font:inherit}
-  textarea{min-height:80px;resize:vertical}
-  .btn{padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
-  .btn.primary{background:var(--accent);color:#fff}
-  .btn.ghost{background:transparent;border:1px solid #c7d2da}
-  .btn.danger{background:var(--danger);color:#fff}
-  pre.report{white-space:pre-wrap;background:#fcfeff;border:1px dashed #e6eef3;padding:12px;border-radius:8px;min-height:180px}
-  .muted{color:var(--muted);font-size:13px}
-  .oee-badge{display:inline-block;background:#e6fffa;color:#064e3b;padding:8px 12px;border-radius:999px;font-weight:800}
-  .small{font-size:13px;color:#64748b}
-  .row{display:flex;gap:8px;flex-wrap:wrap}
-</style>
+  <meta charset="UTF-8">
+  <title>Laporan Produksi Harian</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+    h2 { background: #343a40; color: white; padding: 10px; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: white; }
+    th, td { border: 1px solid #dee2e6; padding: 8px; text-align: center; }
+    th { background: #e9ecef; }
+    .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+    .btn-save { background: #28a745; color: white; }
+    .btn-delete { background: #dc3545; color: white; }
+    .btn-login { background: #007bff; color: white; }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Form Laporan Harian Produksi (Draft)</h1>
-  <p class="muted">Format besar mengikuti versi awal — Preparation, Pulp, Finish Good, Cylinder, Slitting. OEE memakai rumus teori (A×P×Q) tapi hasil yang tampil hanya nilai OEE akhir.</p>
 
-  <!-- Header / meta -->
-  <div class="card">
-    <div class="grid-3">
-      <div>
-        <label>Tanggal</label>
-        <input type="date" id="tanggal">
-      </div>
-      <div>
-        <label>Produk</label>
-        <input type="text" id="produk" value="PTWCJ-HLD-003">
-      </div>
-      <div>
-        <label>Shift</label>
-        <select id="shift"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
-      </div>
-    </div>
-  </div>
+  <h2>Laporan Produksi Harian</h2>
 
-  <!-- Machine / OEE params -->
-  <div class="card">
-    <h3>Parameter Mesin & Waktu (untuk OEE teori)</h3>
-    <div class="grid-3">
-      <div>
-        <label>Planned production time (menit)</label>
-        <input type="number" id="plannedTime" value="480" min="1">
-        <div class="small">Contoh: 480 (8 jam)</div>
-      </div>
-      <div>
-        <label>Downtime (menit)</label>
-        <input type="number" id="downtime" value="0" min="0">
-        <div class="small">Isi 0 jika tidak ada downtime.</div>
-      </div>
-      <div>
-        <label>Kecepatan mesin (m/min)</label>
-        <input type="number" id="speed" value="15" step="0.01" min="0">
-      </div>
+  <!-- Preparation -->
+  <h3>Preparation</h3>
+  <table>
+    <tr><th>Item</th><th>Jumlah</th></tr>
+    <tr><td>Bobin</td><td><input type="number" id="prep_bobin"></td></tr>
+    <tr><td>Reject</td><td><input type="number" id="prep_reject"></td></tr>
+  </table>
 
-      <div>
-        <label>Lebar web (m)</label>
-        <input type="number" id="width" value="1.2" step="0.01" min="0">
-      </div>
-      <div>
-        <label>GSM (g/m²)</label>
-        <input type="number" id="gsm" value="95" step="0.1" min="0">
-      </div>
-      <div>
-        <label>Kg per bobin</label>
-        <input type="number" id="kgPerBobin" value="15" step="0.1" min="0">
-      </div>
-    </div>
-  </div>
+  <!-- Pulp -->
+  <h3>Pulp</h3>
+  <table>
+    <tr><th>Item</th><th>Jumlah</th></tr>
+    <tr><td>Pulp Masuk</td><td><input type="number" id="pulp_in"></td></tr>
+    <tr><td>Pulp Keluar</td><td><input type="number" id="pulp_out"></td></tr>
+  </table>
 
-  <!-- Sections: Preparation -->
-  <div class="card">
-    <h3>PREPARATION</h3>
-    <div class="grid-3">
-      <div>
-        <label>Pulp Tank (set)</label>
-        <input type="number" id="prep_pulp" min="0">
-      </div>
-      <div>
-        <label>Vitacel Mix A (set)</label>
-        <input type="number" id="prep_vit_a" min="0">
-      </div>
-      <div>
-        <label>Vitacel Mix B (set)</label>
-        <input type="number" id="prep_vit_b" min="0">
-      </div>
-
-      <div>
-        <label>Adhesive Standby (set)</label>
-        <input type="number" id="prep_adh_s" min="0">
-      </div>
-      <div>
-        <label>Adhesive di Tangki (set)</label>
-        <input type="number" id="prep_adh_t" min="0">
-      </div>
-      <div>
-        <label>CMC (set)</label>
-        <input type="number" id="prep_cmc" min="0">
-      </div>
-    </div>
-  </div>
-
-  <!-- Pulp Standby / Finish Good -->
-  <div class="card">
-    <h3>PULP / FINISH GOOD</h3>
-    <div class="grid-3">
-      <div>
-        <label>Pulp Standby Tank 203 (set)</label>
-        <input type="number" id="pulp203" min="0">
-      </div>
-      <div>
-        <label>Mother Roll (MR)</label>
-        <input type="number" id="mr" min="0">
-        <div class="small">1 MR = 6 bobin</div>
-      </div>
-      <div>
-        <label>Total Berat FG (kg)</label>
-        <input type="number" id="fg_total" min="0">
-      </div>
-    </div>
-  </div>
+  <!-- Finish Good -->
+  <h3>Finish Good</h3>
+  <table>
+    <tr><th>Item</th><th>Jumlah</th></tr>
+    <tr><td>Jumlah FG</td><td><input type="number" id="fg_jumlah"></td></tr>
+    <tr><td>Reject FG</td><td><input type="number" id="fg_reject"></td></tr>
+  </table>
 
   <!-- Cylinder -->
-  <div class="card">
-    <h3>CYLINDER</h3>
-    <div class="grid-3">
-      <div>
-        <label>Jumlah Cylinder (pcs)</label>
-        <input type="number" id="cylinder_count" min="0">
-      </div>
-      <div>
-        <label>Keterangan Cylinder</label>
-        <input type="text" id="cylinder_note">
-      </div>
-      <div class="small muted">Kosongkan jika tidak ada.</div>
-    </div>
-  </div>
+  <h3>Cylinder</h3>
+  <table>
+    <tr><th>Item</th><th>Jumlah</th></tr>
+    <tr><td>Cylinder Masuk</td><td><input type="number" id="cyl_in"></td></tr>
+    <tr><td>Cylinder Keluar</td><td><input type="number" id="cyl_out"></td></tr>
+  </table>
 
   <!-- Slitting -->
-  <div class="card">
-    <h3>SLITTING</h3>
-    <div class="grid-3">
-      <div>
-        <label>Jumlah MR untuk Slitting (MR)</label>
-        <input type="number" id="slit_mr" min="0" value="6">
-        <div class="small">1 MR = 6 bobin (opsional)</div>
-      </div>
-      <div>
-        <label>Total Slitting (bobin)</label>
-        <input type="number" id="slit_total" min="0" value="36">
-      </div>
-      <div>
-        <label>Bobin Reject Produksi (pcs)</label>
-        <input type="number" id="slit_reject_prod" min="0" value="3">
-      </div>
+  <h3>Slitting</h3>
+  <table>
+    <tr><th>Item</th><th>Jumlah</th></tr>
+    <tr><td>Total Bobin</td><td><input type="number" id="slit_total"></td></tr>
+    <tr><td>Reject Produksi</td><td><input type="number" id="slit_reject"></td></tr>
+    <tr><td>Reject NCP</td><td><input type="number" id="slit_ncp"></td></tr>
+    <tr><td>Berat per Bobin (kg)</td><td><input type="number" id="slit_kg"></td></tr>
+  </table>
+  <button class="btn btn-save" onclick="hitungSlitting()">Hitung OEE</button>
 
-      <div>
-        <label>Bobin Reject NCP (pcs)</label>
-        <input type="number" id="slit_reject_ncp" min="0" value="20">
-      </div>
-      <div>
-        <label>(—) OKE (bobin) — otomatis</label>
-        <input type="number" id="slit_oke" readonly>
-      </div>
-      <div>
-        <label>Berat OKE (kg) — otomatis</label>
-        <input type="text" id="slit_oke_kg" readonly>
-      </div>
-    </div>
+  <h4>Hasil Slitting</h4>
+  <table>
+    <tr><th>OKE</th><th>OEE (%)</th></tr>
+    <tr><td id="slit_oke">-</td><td id="slit_oee">-</td></tr>
+  </table>
 
-    <div style="margin-top:12px" class="row">
-      <button class="btn primary" onclick="generateReport()">Tampilkan & Simpan Laporan</button>
-      <button class="btn ghost" onclick="copyReport()">Salin Teks</button>
-      <button id="btnDelete" class="btn danger" style="display:none" onclick="hapusLaporan()">🗑 Hapus Laporan</button>
-    </div>
+  <h2>Rekap Laporan Harian</h2>
+  <table id="rekapTable">
+    <tr>
+      <th>Bagian</th>
+      <th>Jumlah</th>
+      <th>Reject</th>
+      <th>OKE</th>
+      <th>OEE (%)</th>
+    </tr>
+    <tr><td>Preparation</td><td id="rekap_prep">-</td><td id="rekap_prep_rej">-</td><td>-</td><td>-</td></tr>
+    <tr><td>Pulp</td><td id="rekap_pulp">-</td><td>-</td><td>-</td><td>-</td></tr>
+    <tr><td>Finish Good</td><td id="rekap_fg">-</td><td id="rekap_fg_rej">-</td><td>-</td><td>-</td></tr>
+    <tr><td>Cylinder</td><td id="rekap_cyl">-</td><td>-</td><td>-</td><td>-</td></tr>
+    <tr><td>Slitting</td><td id="rekap_slit">-</td><td id="rekap_slit_rej">-</td><td id="rekap_slit_oke">-</td><td id="rekap_slit_oee">-</td></tr>
+  </table>
 
-    <div style="margin-top:14px">
-      <div class="small muted">Hasil OEE (teori) — hanya menampilkan nilai akhir:</div>
-      <div style="margin-top:8px"><span class="oee-badge" id="oeeResult">-</span></div>
-    </div>
+  <button class="btn btn-save" onclick="simpanLaporan()">Simpan Laporan</button>
+  <button class="btn btn-delete" onclick="mintaLogin()">Hapus Laporan</button>
+
+  <!-- Modal Login -->
+  <div id="loginModal" style="display:none; background:#fff; border:1px solid #ccc; padding:20px;">
+    <h3>Login untuk Hapus</h3>
+    <label>Username: <input type="text" id="username"></label><br><br>
+    <label>Password: <input type="password" id="password"></label><br><br>
+    <button class="btn btn-login" onclick="hapusDenganLogin()">Login & Hapus</button>
   </div>
 
-  <!-- Preview -->
-  <div class="card">
-    <h3>PREVIEW LAPORAN</h3>
-    <pre id="report" class="report">Tekan "Tampilkan & Simpan Laporan" untuk membuat laporan.</pre>
-  </div>
-</div>
+  <script>
+    function hitungSlitting() {
+      let total = parseInt(document.getElementById("slit_total").value) || 0;
+      let rejProd = parseInt(document.getElementById("slit_reject").value) || 0;
+      let rejNcp = parseInt(document.getElementById("slit_ncp").value) || 0;
 
-<script>
-/* Helper & constants */
-const STORAGE_KEY = 'laporan_harian_draft_v1';
-const els = {
-  tanggal: document.getElementById('tanggal'),
-  produk: document.getElementById('produk'),
-  shift: document.getElementById('shift'),
-  plannedTime: document.getElementById('plannedTime'),
-  downtime: document.getElementById('downtime'),
-  speed: document.getElementById('speed'),
-  width: document.getElementById('width'),
-  gsm: document.getElementById('gsm'),
-  kgPerBobin: document.getElementById('kgPerBobin'),
-  totalBobin: document.getElementById('slit_total'),
-  rejectProd: document.getElementById('slit_reject_prod'),
-  rejectNcp: document.getElementById('slit_reject_ncp'),
-  slitOke: document.getElementById('slit_oke'),
-  slitOkeKg: document.getElementById('slit_oke_kg'),
-  oeeResult: document.getElementById('oeeResult'),
-  report: document.getElementById('report'),
-  btnDelete: document.getElementById('btnDelete')
-};
+      let oke = total - rejProd - rejNcp;
+      if (oke < 0) oke = 0;
 
-/* default date to today if empty */
-if(!els.tanggal.value) { els.tanggal.valueAsDate = new Date(); }
+      // Rumus sederhana OEE dari total bobin
+      let quality = (oke / total) || 0;
+      let availability = 1; // diasumsikan tidak ada downtime
+      let performance = 1;  // diasumsikan sesuai target
+      let oee = availability * performance * quality * 100;
 
-/* compute functions */
-function computeValues(){
-  const planned = parseFloat(document.getElementById('plannedTime').value) || 480;
-  const downtime = parseFloat(document.getElementById('downtime').value) || 0;
-  const availability = planned>0 ? Math.max((planned - downtime)/planned,0) : 0;
+      document.getElementById("slit_oke").innerText = oke;
+      document.getElementById("slit_oee").innerText = oee.toFixed(2);
 
-  const speed = parseFloat(document.getElementById('speed').value) || 15; // m/min
-  const width = parseFloat(document.getElementById('width').value) || 1.2; // m
-  const gsm_gm2 = parseFloat(document.getElementById('gsm').value) || 95; // g/m2
-  const gsm = gsm_gm2 / 1000; // kg/m2
+      document.getElementById("rekap_slit").innerText = total;
+      document.getElementById("rekap_slit_rej").innerText = rejProd + rejNcp;
+      document.getElementById("rekap_slit_oke").innerText = oke;
+      document.getElementById("rekap_slit_oee").innerText = oee.toFixed(2);
+    }
 
-  const kgPerBobin = parseFloat(document.getElementById('kgPerBobin').value) || 15;
+    function simpanLaporan() {
+      alert("Laporan berhasil disimpan (simulasi).");
+    }
 
-  const totalBobin = parseFloat(els.totalBobin.value) || 0;
-  const rejectProd = parseFloat(els.rejectProd.value) || 0;
-  const rejectNcp = parseFloat(els.rejectNcp.value) || 0;
+    function mintaLogin() {
+      document.getElementById("loginModal").style.display = "block";
+    }
 
-  const okeBobin = Math.max(totalBobin - rejectProd - rejectNcp, 0);
-  const okeKg = okeBobin * kgPerBobin;
+    function hapusDenganLogin() {
+      let user = document.getElementById("username").value;
+      let pass = document.getElementById("password").value;
 
-  const theoreticalKg = speed * width * gsm * planned; // kg ideal
-  const actualKg = totalBobin * kgPerBobin; // per kesepakatan: performance pakai total bobin * kgPerBobin
-
-  const performance = theoreticalKg>0 ? Math.max(actualKg/theoreticalKg, 0) : 0;
-  const quality = totalBobin>0 ? Math.max(okeBobin/totalBobin, 0) : 0;
-
-  const oee = availability * performance * quality;
-
-  return {
-    planned, downtime, availability, speed, width, gsm_gm2, theoreticalKg, actualKg,
-    kgPerBobin, totalBobin, rejectProd, rejectNcp, okeBobin, okeKg, performance, quality, oee
-  };
-}
-
-/* build report text similar structure as original */
-function buildReportText(c){
-  const dt = document.getElementById('tanggal').value || new Date().toLocaleDateString();
-  const produk = document.getElementById('produk').value || '-';
-  const shift = document.getElementById('shift').value || '-';
-
-  const prepPulp = document.getElementById('prep_pulp').value || '';
-  const prepVa = document.getElementById('prep_vit_a').value || '';
-  const prepVb = document.getElementById('prep_vit_b').value || '';
-  const prepAdhs = document.getElementById('prep_adh_s').value || '';
-  const prepAdht = document.getElementById('prep_adh_t').value || '';
-  const prepCmc = document.getElementById('prep_cmc').value || '';
-
-  const pulp203 = document.getElementById('pulp203').value || '';
-  const mr = document.getElementById('mr').value || '';
-  const fg_total = document.getElementById('fg_total').value || '';
-
-  const cylinder_count = document.getElementById('cylinder_count').value || '';
-  const cylinder_note = document.getElementById('cylinder_note').value || '';
-
-  const note = document.getElementById('note').value || '';
-
-  const lines = [];
-  lines.push(`LAPORAN SHIFT ${shift}`);
-  lines.push(`Tanggal: ${dt}`);
-  lines.push(`Produk: ${produk}`);
-  lines.push(`========================================\n`);
-
-  lines.push(`PREPARATION:`);
-  if(prepPulp) lines.push(`- Pulp Tank: ${prepPulp} set`);
-  if(prepVa) lines.push(`- Vitacel A: ${prepVa} set`);
-  if(prepVb) lines.push(`- Vitacel B: ${prepVb} set`);
-  if(prepAdhs) lines.push(`- Adhesive Standby: ${prepAdhs} set`);
-  if(prepAdht) lines.push(`- Adhesive Tangki: ${prepAdht} set`);
-  if(prepCmc) lines.push(`- CMC: ${prepCmc} set`);
-  lines.push(`\nPULP / FINISH GOOD:`);
-  if(pulp203) lines.push(`- Pulp Standby Tank 203: ${pulp203} set`);
-  if(mr) lines.push(`- Mother Roll: ${mr} MR`);
-  if(fg_total) lines.push(`- Berat FG: ${fg_total} kg`);
-
-  lines.push(`\nCYLINDER:`);
-  if(cylinder_count) lines.push(`- Jumlah Cylinder: ${cylinder_count} pcs`);
-  if(cylinder_note) lines.push(`- Keterangan: ${cylinder_note}`);
-
-  lines.push(`\nSLITTING:`);
-  lines.push(`- Total Bobin: ${c.totalBobin} bobin`);
-  lines.push(`- Reject Produksi: ${c.rejectProd} bobin`);
-  lines.push(`- Reject NCP: ${c.rejectNcp} bobin`);
-  lines.push(`- OKE: ${c.okeBobin} bobin (${c.okeKg.toFixed(2)} kg)`);
-
-  // OEE final only
-  lines.push(`\n📈 OEE: ${(c.oee*100).toFixed(2)} %`);
-  lines.push(`\nCatatan: ${note}`);
-
-  lines.push(`\n========================================`);
-  return lines.join('\n');
-}
-
-/* UI actions */
-function generateReport(){
-  // compute
-  const c = computeValues();
-
-  // set OKE fields
-  els.slitOke.value = c.okeBobin;
-  els.slitOkeKg.value = c.okeKg.toFixed(2);
-
-  // set OEE badge (only final result)
-  els.oeeResult.textContent = (c.oee*100).toFixed(2) + ' %';
-
-  // build report text
-  const text = buildReportText(c);
-  els.report.textContent = text;
-
-  // save to localStorage (draft)
-  const dataToSave = {
-    timestamp: new Date().toISOString(),
-    form: {
-      tanggal: document.getElementById('tanggal').value,
-      produk: document.getElementById('produk').value,
-      shift: document.getElementById('shift').value,
-      params: {
-        plannedTime: document.getElementById('plannedTime').value,
-        downtime: document.getElementById('downtime').value,
-        speed: document.getElementById('speed').value,
-        width: document.getElementById('width').value,
-        gsm: document.getElementById('gsm').value,
-        kgPerBobin: document.getElementById('kgPerBobin').value
-      },
-      prep: {
-        pulp: document.getElementById('prep_pulp').value,
-        vitA: document.getElementById('prep_vit_a').value,
-        vitB: document.getElementById('prep_vit_b').value,
-        adhS: document.getElementById('prep_adh_s').value,
-        adhT: document.getElementById('prep_adh_t').value,
-        cmc: document.getElementById('prep_cmc').value
-      },
-      pulp: {
-        pulp203: document.getElementById('pulp203').value,
-        mr: document.getElementById('mr').value,
-        fg_total: document.getElementById('fg_total').value
-      },
-      cylinder: {
-        count: document.getElementById('cylinder_count').value,
-        note: document.getElementById('cylinder_note').value
-      },
-      slitting: {
-        slit_mr: document.getElementById('slit_mr').value,
-        totalBobin: document.getElementById('slit_total').value,
-        rejectProd: document.getElementById('slit_reject_prod').value,
-        rejectNcp: document.getElementById('slit_reject_ncp').value,
-        okeBobin: c.okeBobin,
-        okeKg: c.okeKg
-      },
-      note: document.getElementById('note').value
-    },
-    reportText: text,
-    oeeValue: c.oee
-  };
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-  alert('✅ Laporan tersimpan (draft) di localStorage.');
-  els.btnDelete.style.display = 'inline-block';
-}
-
-/* copy report to clipboard */
-function copyReport(){
-  const text = els.report.textContent;
-  if(!text.trim()){ alert('Tidak ada laporan untuk disalin. Tekan "Tampilkan & Simpan Laporan" dulu.'); return; }
-  navigator.clipboard.writeText(text).then(()=>alert('📋 Laporan disalin ke clipboard.'));
-}
-
-/* delete with prompt auth */
-function hapusLaporan(){
-  const user = prompt('Masukkan username:');
-  if(user !== 'Tirta'){ alert('Username salah'); return; }
-  const pass = prompt('Masukkan password:');
-  if(pass !== 'Komunitas'){ alert('Password salah'); return; }
-  localStorage.removeItem(STORAGE_KEY);
-
-  // clear UI
-  els.report.textContent = 'Laporan dihapus.';
-  els.oeeResult.textContent = '-';
-  els.slitOke.value = '';
-  els.slitOkeKg.value = '';
-  els.btnDelete.style.display = 'none';
-  alert('✅ Semua laporan berhasil dihapus.');
-}
-
-/* load saved draft if exists */
-function loadSaved(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(!raw) return;
-  try{
-    const data = JSON.parse(raw);
-    const f = data.form;
-    if(f){
-      document.getElementById('tanggal').value = f.tanggal || document.getElementById('tanggal').value;
-      document.getElementById('produk').value = f.produk || document.getElementById('produk').value;
-      document.getElementById('shift').value = f.shift || document.getElementById('shift').value;
-      if(f.params){
-        document.getElementById('plannedTime').value = f.params.plannedTime || document.getElementById('plannedTime').value;
-        document.getElementById('downtime').value = f.params.downtime || document.getElementById('downtime').value;
-        document.getElementById('speed').value = f.params.speed || document.getElementById('speed').value;
-        document.getElementById('width').value = f.params.width || document.getElementById('width').value;
-        document.getElementById('gsm').value = f.params.gsm || document.getElementById('gsm').value;
-        document.getElementById('kgPerBobin').value = f.params.kgPerBobin || document.getElementById('kgPerBobin').value;
-      }
-      if(f.prep){
-        document.getElementById('prep_pulp').value = f.prep.pulp || '';
-        document.getElementById('prep_vit_a').value = f.prep.vitA || '';
-        document.getElementById('prep_vit_b').value = f.prep.vitB || '';
-        document.getElementById('prep_adh_s').value = f.prep.adhS || '';
-        document.getElementById('prep_adh_t').value = f.prep.adhT || '';
-        document.getElementById('prep_cmc').value = f.prep.cmc || '';
-      }
-      if(f.pulp){
-        document.getElementById('pulp203').value = f.pulp.pulp203 || '';
-        document.getElementById('mr').value = f.pulp.mr || '';
-        document.getElementById('fg_total').value = f.pulp.fg_total || '';
-      }
-      if(f.cylinder){
-        document.getElementById('cylinder_count').value = f.cylinder.count || '';
-        document.getElementById('cylinder_note').value = f.cylinder.note || '';
-      }
-      if(f.slitting){
-        document.getElementById('slit_mr').value = f.slitting.slit_mr || '';
-        document.getElementById('slit_total').value = f.slitting.totalBobin || '36';
-        document.getElementById('slit_reject_prod').value = f.slitting.rejectProd || '3';
-        document.getElementById('slit_reject_ncp').value = f.slitting.rejectNcp || '20';
-      }
-      document.getElementById('note').value = f.note || '';
-      // display saved report if present
-      els.report.textContent = data.reportText || 'Preview laporan...';
-      if(typeof data.oeeValue === 'number'){
-        els.oeeResult.textContent = (data.oeeValue*100).toFixed(2) + ' %';
-        els.btnDelete.style.display = 'inline-block';
+      if (user === "Tirta" && pass === "Komunitas") {
+        document.getElementById("rekapTable").innerHTML = "";
+        alert("Laporan berhasil dihapus.");
+        document.getElementById("loginModal").style.display = "none";
+      } else {
+        alert("Username atau password salah!");
       }
     }
-  }catch(e){ console.warn('gagal memuat draft', e) }
-}
-
-/* update OKE & OEE realtime when relevant inputs change */
-['slit_total','slit_reject_prod','slit_reject_ncp','kgPerBobin','plannedTime','downtime','speed','width','gsm'].forEach(id=>{
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.addEventListener('input', ()=>{
-    const c = computeValues();
-    els.slitOke.value = c.okeBobin;
-    els.slitOkeKg.value = c.okeKg.toFixed(2);
-    els.oeeResult.textContent = (c.oee*100).toFixed(2) + ' %';
-  });
-});
-
-/* init */
-loadSaved();
-{
-  const c = computeValues();
-  els.slitOke.value = c.okeBobin;
-  els.slitOkeKg.value = c.okeKg.toFixed(2);
-  els.oeeResult.textContent = (c.oee*100).toFixed(2) + ' %';
-}
-</script>
+  </script>
 </body>
 </html>
