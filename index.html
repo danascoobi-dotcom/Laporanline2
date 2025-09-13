@@ -3,173 +3,483 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Laporan Shift A — OEE Global</title>
+  <title>Laporan Shift (Firebase) — Final</title>
   <style>
     :root{
-      --bg:#f6f7f9; --card:#fff; --ink:#111827; --muted:#64748b; --line:#e5e7eb; --accent:#10b981; --danger:#ef4444;
+      --bg:#f6f7f9; --card:#ffffff; --ink:#1f2937; --muted:#64748b; --line:#e5e7eb; --accent:#25d366; --danger:#ef4444;
     }
-    body{font-family:system-ui,Segoe UI,Roboto,Arial; margin:0; background:var(--bg); color:var(--ink)}
-    .wrap{max-width:960px;margin:24px auto;padding:16px}
+    .dark{
+      --bg:#0f1115; --card:#141821; --ink:#e5e7eb; --muted:#a0aec0; --line:#2d3748;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--ink)}
+    .wrap{max-width:980px;margin:28px auto;padding:18px}
+    h1{margin:0 0 10px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
     .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:640px){.grid-3,.grid-2{grid-template-columns:1fr}}
-    label{display:block;font-weight:700;margin-bottom:4px}
+    @media(max-width:880px){.grid-3{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:560px){.grid-3,.grid-2{grid-template-columns:1fr}}
+    label{display:block;font-weight:700;margin-bottom:6px}
     input,textarea,select{width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);font:inherit}
-    textarea{min-height:84px}
-    .btn{padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+    textarea{min-height:84px;resize:vertical}
+    .btn{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:700}
     .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
     .btn.danger{background:var(--danger)}
-    pre{white-space:pre-wrap;background:#fff;border:1px dashed var(--line);padding:12px;border-radius:10px;min-height:120px}
-    .oee-preview{display:flex;align-items:center;gap:12px;margin-top:8px}
-    .oee-badge{background:#ecfdf5;color:#065f46;padding:6px 10px;border-radius:999px;font-weight:700}
-    .bar{height:10px;border-radius:999px;background:#e5e7eb;flex:1;overflow:hidden}
-    .bar span{height:100%;display:block;background:linear-gradient(90deg,#16a34a,#22c55e);width:0%}
+    pre{white-space:pre-wrap;background:#ffffff;border:1px dashed var(--line);padding:12px;border-radius:10px;min-height:140px}
     .muted{color:var(--muted);font-size:13px}
+    .oee-badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#ecfdf5;color:#065f46;font-weight:800}
+    .bar{height:10px;border-radius:999px;background:#e6eef2;overflow:hidden;margin-top:8px}
+    .bar span{display:block;height:100%;background:linear-gradient(90deg,#16a34a,#22c55e);width:0%}
+    .small{font-size:13px;color:var(--muted)}
   </style>
 </head>
 <body>
-<div class="wrap">
-  <h2>Laporan Shift A — Final</h2>
+  <div class="wrap">
+    <h1>Laporan Shift — Final (Firebase)</h1>
+    <p class="muted">Spec: TIME=480 menit, SPEED=15 m/min, WIDTH=1.2 m, GSM=0.095 kg/m². 1 MR=6 bobin, 1 bobin=15 kg.</p>
 
-  <div class="card">
-    <div class="grid-3">
-      <div><label>Tanggal</label><input type="date" id="tanggal"></div>
-      <div><label>Nama Produk</label><input type="text" id="produk" value="PTWCJ-HLD-003"></div>
-      <div><label>Shift</label>
-        <select id="shift"><option>A</option><option>B</option><option>C</option></select>
+    <div class="card">
+      <div class="grid-3">
+        <div>
+          <label>Tanggal</label>
+          <input type="date" id="tanggal">
+        </div>
+        <div>
+          <label>Produk</label>
+          <input type="text" id="produk" value="PTWCJ-HLD-003">
+        </div>
+        <div>
+          <label>Shift</label>
+          <select id="shift"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- LINE 2 -->
+    <div class="card" id="card_line2">
+      <h3>LINE 2</h3>
+      <div class="grid-3">
+        <div><label>Pulp Tank 205 (set)</label><input id="pulp205_2" type="number"></div>
+        <div><label>Vitacel Mix A (set)</label><input id="vit2a" type="number"></div>
+        <div><label>Vitacel Mix B (set)</label><input id="vit2b" type="number"></div>
+        <div><label>Vitacel Standby (set)</label><input id="vit2s" type="number"></div>
+        <div><label>Adhesive Standby (set)</label><input id="adh2s" type="number"></div>
+        <div><label>Adhesive di Tangki (set)</label><input id="adh2t" type="number"></div>
+        <div><label>CMC (set)</label><input id="cmc2" type="number"></div>
+        <div><label>Recycle (set)</label><input id="rec2" type="number"></div>
+        <div><label>Recycle per set (kg)</label><input id="rec2w" type="number"></div>
+        <div><label>Mother Roll (MR)</label><input id="mr2" type="number"></div>
+        <div><label>Total Berat FG (kg)</label><input id="fg2" type="number"></div>
+      </div>
+
+      <div class="grid-2" style="margin-top:10px">
+        <div>
+          <label>Jumlah MR (Slitting)</label>
+          <input id="slit_mr2" type="number" placeholder="isi MR (mis. 7)">
+          <div class="small">1 MR = 6 bobin</div>
+        </div>
+        <div>
+          <label>Bobin Reject Produksi (pcs)</label><input id="reject_produksi2" type="number">
+          <label style="margin-top:8px">Bobin Reject NCP (pcs)</label><input id="reject_ncp2" type="number">
+        </div>
+      </div>
+
+      <div style="margin-top:8px" class="oee-row">
+        <span class="oee-badge" id="oee2">-</span>
+        <div class="bar" aria-hidden><span id="bar2"></span></div>
+      </div>
+    </div>
+
+    <!-- LINE 3 -->
+    <div class="card" id="card_line3">
+      <h3>LINE 3</h3>
+      <div class="grid-3">
+        <div><label>Pulp Tank 204 (set)</label><input id="pulp204_3" type="number"></div>
+        <div><label>Vitacel Mix A (set)</label><input id="vit3a" type="number"></div>
+        <div><label>Vitacel Mix B (set)</label><input id="vit3b" type="number"></div>
+        <div><label>Vitacel Standby (set)</label><input id="vit3s" type="number"></div>
+        <div><label>Adhesive Standby (set)</label><input id="adh3s" type="number"></div>
+        <div><label>Adhesive di Tangki (set)</label><input id="adh3t" type="number"></div>
+        <div><label>CMC (set)</label><input id="cmc3" type="number"></div>
+        <div><label>Recycle (set)</label><input id="rec3" type="number"></div>
+        <div><label>Recycle per set (kg)</label><input id="rec3w" type="number"></div>
+        <div><label>Mother Roll (MR)</label><input id="mr3" type="number"></div>
+        <div><label>Total Berat FG (kg)</label><input id="fg3" type="number"></div>
+      </div>
+
+      <div class="grid-2" style="margin-top:10px">
+        <div>
+          <label>Jumlah MR (Slitting)</label><input id="slit_mr3" type="number" placeholder="isi MR (mis. 6)">
+          <div class="small">1 MR = 6 bobin</div>
+        </div>
+        <div>
+          <label>Bobin Reject Produksi (pcs)</label><input id="reject_produksi3" type="number">
+          <label style="margin-top:8px">Bobin Reject NCP (pcs)</label><input id="reject_ncp3" type="number">
+        </div>
+      </div>
+
+      <div style="margin-top:8px" class="oee-row">
+        <span class="oee-badge" id="oee3">-</span>
+        <div class="bar" aria-hidden><span id="bar3"></span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="grid-2">
+        <div><label>Pulp Standby Tank 203</label><input id="pulp203" type="number"></div>
+        <div><label>Catatan untuk Shift Selanjutnya</label><textarea id="catatan"></textarea></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="btn" onclick="previewLaporan()">Tampilkan & Simpan Lokal</button>
+      <button class="btn ghost" onclick="copyText()">Salin Teks</button>
+      <button class="btn ghost" onclick="shareWA()">Kirim WA</button>
+      <button class="btn ghost" onclick="clearData()">Bersihkan Form</button>
+      <button class="btn ghost" onclick="toggleTheme()">🌙 Mode</button>
+      <button class="btn" onclick="saveToFirebase()">💾 Simpan ke Server (Firebase)</button>
+      <button class="btn danger" onclick="hapusLaporan()">🗑 Hapus Laporan (server)</button>
+    </div>
+
+    <div class="card">
+      <h3>Preview Laporan</h3>
+      <pre id="output">Tekan "Tampilkan & Simpan Lokal" untuk melihat laporan.</pre>
+    </div>
+
+    <div class="card">
+      <h3>📋 Laporan Tersimpan (Real-time)</h3>
+      <div class="grid-3">
+        <div><label>Filter Tanggal</label><input type="date" id="filterTanggal" onchange="renderLaporan()"></div>
+        <div>
+          <label>Filter Shift</label>
+          <select id="filterShift" onchange="renderLaporan()"><option value="">Semua Shift</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+        </div>
+        <div></div>
+      </div>
+      <div id="laporanList" style="margin-top:16px; display:grid; gap:12px;">
+        <p class="muted">Memuat laporan dari server...</p>
       </div>
     </div>
   </div>
 
-  <!-- LINE 2 -->
-  <div class="card">
-    <h3>LINE 2</h3>
-    <div class="grid-3">
-      <div><label>Pulp Tank 205</label><input id="pulp205_2" type="number"></div>
-      <div><label>Vitacel A</label><input id="vit2a" type="number"></div>
-      <div><label>Vitacel B</label><input id="vit2b" type="number"></div>
-      <div><label>Vitacel Standby</label><input id="vit2s" type="number"></div>
-      <div><label>Adhesive Standby</label><input id="adh2s" type="number"></div>
-      <div><label>Adhesive Tangki</label><input id="adh2t" type="number"></div>
-      <div><label>CMC</label><input id="cmc2" type="number"></div>
-      <div><label>Recycle (set)</label><input id="rec2" type="number"></div>
-      <div><label>Recycle per set (kg)</label><input id="rec2w" type="number"></div>
-      <div><label>Mother Roll</label><input id="mr2" type="number"></div>
-      <div><label>Berat FG (kg)</label><input id="fg2" type="number"></div>
-    </div>
-    <div class="grid-2" style="margin-top:10px">
-      <div><label>Jumlah MR (Slitting)</label><input id="slit_mr2" type="number"><div class="muted">1 MR=6 bobin</div></div>
-      <div><label>Reject Produksi (pcs)</label><input id="reject_produksi2" type="number">
-           <label>Reject NCP (pcs)</label><input id="reject_ncp2" type="number"></div>
-    </div>
-    <div class="oee-preview"><div class="oee-badge" id="oee2">-</div><div class="bar"><span id="bar2"></span></div></div>
-  </div>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-  <!-- LINE 3 -->
-  <div class="card">
-    <h3>LINE 3</h3>
-    <div class="grid-3">
-      <div><label>Pulp Tank 204</label><input id="pulp204_3" type="number"></div>
-      <div><label>Vitacel A</label><input id="vit3a" type="number"></div>
-      <div><label>Vitacel B</label><input id="vit3b" type="number"></div>
-      <div><label>Vitacel Standby</label><input id="vit3s" type="number"></div>
-      <div><label>Adhesive Standby</label><input id="adh3s" type="number"></div>
-      <div><label>Adhesive Tangki</label><input id="adh3t" type="number"></div>
-      <div><label>CMC</label><input id="cmc3" type="number"></div>
-      <div><label>Recycle (set)</label><input id="rec3" type="number"></div>
-      <div><label>Recycle per set (kg)</label><input id="rec3w" type="number"></div>
-      <div><label>Mother Roll</label><input id="mr3" type="number"></div>
-      <div><label>Berat FG (kg)</label><input id="fg3" type="number"></div>
-    </div>
-    <div class="grid-2" style="margin-top:10px">
-      <div><label>Jumlah MR (Slitting)</label><input id="slit_mr3" type="number"><div class="muted">1 MR=6 bobin</div></div>
-      <div><label>Reject Produksi (pcs)</label><input id="reject_produksi3" type="number">
-           <label>Reject NCP (pcs)</label><input id="reject_ncp3" type="number"></div>
-    </div>
-    <div class="oee-preview"><div class="oee-badge" id="oee3">-</div><div class="bar"><span id="bar3"></span></div></div>
-  </div>
+    // ====== CONFIG dari HTML awalmu (tetap) ======
+    const firebaseConfig = {
+      apiKey: "AIzaSyCReZ1Hs1p63Sq6DWODvwbKCgpVPUzVKQA",
+      authDomain: "laporanharian-d689c.firebaseapp.com",
+      databaseURL: "https://laporanharian-d689c-default-rtdb.firebaseio.com",
+      projectId: "laporanharian-d689c",
+      storageBucket: "laporanharian-d689c.appspot.com",
+      messagingSenderId: "161606001787",
+      appId: "1:161606001787:web:a2550a1abf208ce188aede",
+      measurementId: "G-E9SL4RT4TB"
+    };
+    // =============================================
 
-  <div class="card">
-    <div class="grid-2">
-      <div><label>Pulp Standby 203</label><input id="pulp203" type="number"></div>
-      <div><label>Catatan</label><textarea id="catatan"></textarea></div>
-    </div>
-  </div>
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-    <button class="btn" onclick="previewLaporan()">Tampilkan</button>
-    <button class="btn ghost" onclick="copyText()">Salin</button>
-  </div>
+    // KONSTANTA OEE
+    const SPEED = 15, WIDTH = 1.2, GSM = 0.095, TIME_MIN = 480;
+    const MR_TO_BOBIN = 6, KG_PER_BOBIN = 15;
+    const THEORETICAL_KG = SPEED * WIDTH * GSM * TIME_MIN;
+    const nf = new Intl.NumberFormat('id-ID',{maximumFractionDigits:2});
 
-  <div class="card"><pre id="output"></pre></div>
-</div>
+    function val(id){ const el = document.getElementById(id); return el?el.value:''; }
+    function num(id){ const v = val(id); return v === '' ? 0 : parseFloat(v) || 0; }
 
-<script>
-const SPEED=15, WIDTH=1.2, GSM=0.095, TIME=480, KG_PER_BOBIN=15, MR2BOB=6;
-const nf=new Intl.NumberFormat('id-ID',{maximumFractionDigits:2});
-
-function g(id){return document.getElementById(id).value;}
-function n(id){return parseFloat(g(id))||0;}
-function isFilledLine(line){
-  return ["pulp205_"+line,"pulp204_"+line,"vit"+line+"a","vit"+line+"b","vit"+line+"s",
-          "adh"+line+"s","adh"+line+"t","cmc"+line,"rec"+line,"rec"+line+"w","mr"+line,
-          "fg"+line,"slit_mr"+line,"reject_produksi"+line,"reject_ncp"+line]
-    .some(id=>document.getElementById(id)&&g(id)!=="");
-}
-function computeOEE(total,good){
-  const actKg=total*KG_PER_BOBIN, theo=SPEED*WIDTH*GSM*TIME;
-  const perf=theo>0?actKg/theo:0, qual=total>0?good/total:0;
-  return perf*qual*100;
-}
-function lineReport(line){
-  if(!isFilledLine(line)) return "";
-  let t=`\n\n---\n\nLINE ${line}\n`;
-  if(n("pulp205_"+line)||n("pulp204_"+line))t+=`- Pulp Tank: ${n("pulp205_"+line)||n("pulp204_"+line)} set\n`;
-  if(n("vit"+line+"a"))t+=`- Vitacel A: ${n("vit"+line+"a")} set\n`;
-  if(n("vit"+line+"b"))t+=`- Vitacel B: ${n("vit"+line+"b")} set\n`;
-  if(n("vit"+line+"s"))t+=`- Vitacel Standby: ${n("vit"+line+"s")} set\n`;
-  if(n("adh"+line+"s"))t+=`- Adhesive Standby: ${n("adh"+line+"s")} set\n`;
-  if(n("adh"+line+"t"))t+=`- Adhesive Tangki: ${n("adh"+line+"t")} set\n`;
-  if(n("cmc"+line))t+=`- CMC: ${n("cmc"+line)} set\n`;
-  if(n("rec"+line)&&n("rec"+line+"w"))t+=`- Recycle: ${n("rec"+line)} set (${n("rec"+line+"w")} kg/set)\n`;
-  if(n("mr"+line))t+=`- Mother Roll: ${n("mr"+line)} MR\n`;
-  if(n("fg"+line))t+=`- Berat FG: ${n("fg"+line)} kg\n`;
-  const mr=n("slit_mr"+line), total=mr*MR2BOB, rp=n("reject_produksi"+line), rn=n("reject_ncp"+line), good=Math.max(total-rp-rn,0);
-  if(total>0){
-    t+=`\nSlitting:\n- Slitting: ${total} bobin\n`;
-    if(rp>0)t+=`- Reject Produksi: ${rp} bobin\n`;
-    if(rn>0)t+=`- Reject NCP: ${rn} bobin\n`;
-    t+=`- OKE: ${good} bobin (${good*KG_PER_BOBIN} kg)\n`;
-    t+=`\n📈 OEE: ${nf.format(computeOEE(total,good))}%\n`;
-  }
-  return t;
-}
-function previewLaporan(){
-  let isi=`LAPORAN SHIFT ${g("shift")}\nTanggal: ${g("tanggal")}\nProduk: ${g("produk")}`;
-  isi+=lineReport(2);
-  isi+=lineReport(3);
-  if(n("pulp203")||g("catatan")){
-    isi+=`\n\nCatatan Tambahan:\n`;
-    if(n("pulp203"))isi+=`- Pulp 203: ${n("pulp203")} set\n`;
-    if(g("catatan"))isi+=`- ${g("catatan")}\n`;
-  }
-  document.getElementById("output").innerText=isi;
-  // reset OEE badge jika kosong
-  [2,3].forEach(line=>{
-    const badge=document.getElementById("oee"+line), bar=document.getElementById("bar"+line);
-    if(!isFilledLine(line)){badge.textContent="-";bar.style.width="0%";}
-    else {
-      const mr=n("slit_mr"+line), total=mr*MR2BOB, good=Math.max(total-n("reject_produksi"+line)-n("reject_ncp"+line),0);
-      const oee=computeOEE(total,good);badge.textContent=nf.format(oee)+"%";bar.style.width=Math.min(oee,100)+"%";
+    // cek apakah suatu line (2 atau 3) punya field yang diisi
+    function isLineFilled(line){
+      const ids = [
+        `pulp${line === 2 ? '205_2' : '204_'+line}`, // handled below differently: will check both pulp205_2 and pulp204_3 names
+      ];
+      // Better to check known inputs per line
+      const inputsLine2 = ['pulp205_2','vit2a','vit2b','vit2s','adh2s','adh2t','cmc2','rec2','rec2w','mr2','fg2','slit_mr2','reject_produksi2','reject_ncp2'];
+      const inputsLine3 = ['pulp204_3','vit3a','vit3b','vit3s','adh3s','adh3t','cmc3','rec3','rec3w','mr3','fg3','slit_mr3','reject_produksi3','reject_ncp3'];
+      const idsToCheck = line === 2 ? inputsLine2 : inputsLine3;
+      return idsToCheck.some(id => {
+        const el = document.getElementById(id);
+        return el && el.value !== '';
+      });
     }
-  });
-}
-function copyText(){
-  let t=document.getElementById("output").innerText;
-  if(!t.trim()){alert("Laporan kosong!");return;}
-  navigator.clipboard.writeText(t).then(()=>alert("Disalin"));
-}
-</script>
+
+    // PERHITUNGAN OEE global: berdasarkan total bobin (MR*6) dan OKE bobin
+    function computeOEE(totalBobin, okeBobin){
+      if(totalBobin <= 0) return { oee: 0, availability: 1, performance: 0, quality: 0, actualKg: 0, theoreticalKg: THEORETICAL_KG };
+      const actualKg = totalBobin * KG_PER_BOBIN;
+      const performance = THEORETICAL_KG > 0 ? Math.max(0, actualKg / THEORETICAL_KG) : 0;
+      const quality = Math.max(0, okeBobin / totalBobin);
+      const availability = 1; // diasumsikan 100%
+      const oee = availability * performance * quality;
+      return { oee, availability, performance, quality, actualKg, theoreticalKg: THEORETICAL_KG };
+    }
+
+    // Update OEE badge untuk preview (per line)
+    function updateOEEPreview(line){
+      const mr = num(`slit_mr${line}`);
+      const totalBobin = mr * MR_TO_BOBIN;
+      const rp = num(`reject_produksi${line}`);
+      const rn = num(`reject_ncp${line}`);
+      const oke = Math.max(totalBobin - rp - rn, 0);
+      const stats = computeOEE(totalBobin, oke);
+      const pct = stats.oee * 100;
+      const badge = document.getElementById(`oee${line}`);
+      const bar = document.getElementById(`bar${line}`);
+      if(totalBobin > 0){
+        badge.textContent = nf.format(pct) + '%';
+        bar.style.width = Math.min(pct,100) + '%';
+      } else {
+        badge.textContent = '-';
+        bar.style.width = '0%';
+      }
+    }
+
+    // helper add line conditionally
+    function addIf(arr, cond, text){ if(cond) arr.push(text); }
+
+    // Build narration for a line, only include non-empty items
+    function buildLineNarration(line){
+      const parts = [];
+      if(line === 2){
+        if(num('pulp205_2')) addIf(parts, true, `- Pulp Tank: ${num('pulp205_2')} set`);
+        addIf(parts, num('vit2a'), `- Vitacel A: ${num('vit2a')} set`);
+        addIf(parts, num('vit2b'), `- Vitacel B: ${num('vit2b')} set`);
+        addIf(parts, num('vit2s'), `- Vitacel Standby: ${num('vit2s')} set`);
+        addIf(parts, num('adh2s'), `- Adhesive Standby: ${num('adh2s')} set`);
+        addIf(parts, num('adh2t'), `- Adhesive Tangki: ${num('adh2t')} set`);
+        addIf(parts, num('cmc2'), `- CMC: ${num('cmc2')} set`);
+        if(num('rec2') && num('rec2w')) addIf(parts, true, `- Recycle: ${num('rec2')} set (${num('rec2w')} kg/set)`);
+        // Finish Good
+        if(num('mr2')) addIf(parts, true, `- Mother Roll: ${num('mr2')} MR`);
+        if(num('fg2')) addIf(parts, true, `- Berat FG: ${num('fg2')} kg`);
+        // Slitting
+        const total = num('slit_mr2') * MR_TO_BOBIN;
+        const rp = num('reject_produksi2'), rn = num('reject_ncp2');
+        if(total || rp || rn){
+          const ok = Math.max(total - rp - rn, 0);
+          addIf(parts, true, `\nSlitting:`);
+          addIf(parts, total>0, `- Slitting: ${total} bobin`);
+          addIf(parts, rp>0, `- Reject Produksi: ${rp} bobin`);
+          addIf(parts, rn>0, `- Reject NCP: ${rn} bobin`);
+          addIf(parts, true, `- OKE: ${ok} bobin (${(ok*KG_PER_BOBIN).toFixed(2)} kg)`);
+          const stats = computeOEE(total, ok);
+          addIf(parts, total>0, `\n📈 OEE: ${(stats.oee*100).toFixed(2)}%`);
+        }
+      } else {
+        if(num('pulp204_3')) addIf(parts, true, `- Pulp Tank: ${num('pulp204_3')} set`);
+        addIf(parts, num('vit3a'), `- Vitacel A: ${num('vit3a')} set`);
+        addIf(parts, num('vit3b'), `- Vitacel B: ${num('vit3b')} set`);
+        addIf(parts, num('vit3s'), `- Vitacel Standby: ${num('vit3s')} set`);
+        addIf(parts, num('adh3s'), `- Adhesive Standby: ${num('adh3s')} set`);
+        addIf(parts, num('adh3t'), `- Adhesive Tangki: ${num('adh3t')} set`);
+        addIf(parts, num('cmc3'), `- CMC: ${num('cmc3')} set`);
+        if(num('rec3') && num('rec3w')) addIf(parts, true, `- Recycle: ${num('rec3')} set (${num('rec3w')} kg/set)`);
+        // Finish Good
+        if(num('mr3')) addIf(parts, true, `- Mother Roll: ${num('mr3')} MR`);
+        if(num('fg3')) addIf(parts, true, `- Berat FG: ${num('fg3')} kg`);
+        // Slitting
+        const total = num('slit_mr3') * MR_TO_BOBIN;
+        const rp = num('reject_produksi3'), rn = num('reject_ncp3');
+        if(total || rp || rn){
+          const ok = Math.max(total - rp - rn, 0);
+          addIf(parts, true, `\nSlitting:`);
+          addIf(parts, total>0, `- Slitting: ${total} bobin`);
+          addIf(parts, rp>0, `- Reject Produksi: ${rp} bobin`);
+          addIf(parts, rn>0, `- Reject NCP: ${rn} bobin`);
+          addIf(parts, true, `- OKE: ${ok} bobin (${(ok*KG_PER_BOBIN).toFixed(2)} kg)`);
+          const stats = computeOEE(total, ok);
+          addIf(parts, total>0, `\n📈 OEE: ${(stats.oee*100).toFixed(2)}%`);
+        }
+      }
+      if(parts.length === 0) return '';
+      return `\n\n---\n\nLINE ${line}\n\n${parts.join('\n')}\n`;
+    }
+
+    // Build full report text (only include lines that have content)
+    function buildReportText(){
+      const header = `LAPORAN SHIFT ${val('shift')}\nTanggal: ${val('tanggal')}\nProduk: ${val('produk')}`;
+      let body = '';
+      if(isLineFilled(2)) body += buildLineNarration(2);
+      if(isLineFilled(3)) body += buildLineNarration(3);
+      if(num('pulp203') || val('catatan').trim() !== ''){
+        body += `\n\nCatatan Tambahan:\n`;
+        if(num('pulp203')) body += `- Pulp 203: ${num('pulp203')} set\n`;
+        if(val('catatan').trim() !== '') body += `- ${val('catatan')}\n`;
+      }
+      return header + body;
+    }
+
+    // Show preview & update OEE badges; save draft to localStorage
+    window.previewLaporan = function(){
+      const txt = buildReportText();
+      document.getElementById('output').innerText = txt || `LAPORAN SHIFT ${val('shift')}\nTanggal: ${val('tanggal')}\nProduk: ${val('produk')}`;
+      // update preview badges
+      updateOEEPreview(2); updateOEEPreview(3);
+      // save draft locally
+      const draft = {};
+      document.querySelectorAll('input,textarea,select').forEach(el => draft[el.id] = el.value);
+      localStorage.setItem('laporan_draft', JSON.stringify(draft));
+    }
+
+    // Copy text
+    window.copyText = function(){ const t = document.getElementById('output').innerText; if(!t.trim()){ alert('Laporan kosong!'); return; } navigator.clipboard.writeText(t).then(()=>alert('📋 Laporan disalin ke clipboard')) }
+
+    // Share WA
+    window.shareWA = function(){ let t = document.getElementById('output').innerText || buildReportText(); window.open(`https://wa.me/?text=${encodeURIComponent(t)}`, '_blank'); }
+
+    // Clear form
+    window.clearData = function(){ if(!confirm('Hapus semua data di form?')) return; document.querySelectorAll('input,textarea,select').forEach(el => el.value = ''); document.getElementById('output').innerText = 'Tekan "Tampilkan & Simpan Lokal" untuk melihat laporan.'; updateOEEPreview(2); updateOEEPreview(3); localStorage.removeItem('laporan_draft'); }
+
+    // Toggle theme
+    window.toggleTheme = function(){ document.body.classList.toggle('dark'); localStorage.setItem('theme', document.body.classList.contains('dark')?'dark':'light'); }
+
+    // Save to Firebase
+    window.saveToFirebase = function(){
+      const tanggal = val('tanggal');
+      if(!tanggal){ alert('⚠️ Isi tanggal dulu sebelum menyimpan ke server!'); return; }
+      const formData = {};
+      document.querySelectorAll('input,textarea,select').forEach(el => formData[el.id] = el.value);
+      // derive slitting totals for each line
+      const derived = {};
+      ['2','3'].forEach(line => {
+        const mr = num(`slit_mr${line}`);
+        const totalBobin = mr * MR_TO_BOBIN;
+        const rp = num(`reject_produksi${line}`);
+        const rn = num(`reject_ncp${line}`);
+        const okeBobin = Math.max(totalBobin - rp - rn, 0);
+        derived[`line${line}`] = { totalBobin, okeBobin, okeKg: okeBobin * KG_PER_BOBIN };
+        const stats = computeOEE(totalBobin, okeBobin);
+        derived[`line${line}`].oee = stats.oee; derived[`line${line}`].oeePct = stats.oee * 100;
+      });
+
+      const teks = buildReportText();
+      const laporanRef = ref(db, 'laporan/' + tanggal);
+      const newRef = push(laporanRef);
+      set(newRef, {
+        formData,
+        derived,
+        teks,
+        shift: val('shift'),
+        waktu: new Date().toISOString()
+      })
+      .then(() => {
+        alert('✅ Laporan berhasil disimpan ke server (Firebase).');
+      })
+      .catch(err => {
+        console.error(err);
+        alert('❌ Gagal menyimpan ke server: ' + err.message);
+      });
+    }
+
+    // Render real-time laporan (from Firebase)
+    let semuaLaporan = {};
+    const laporanListEl = document.getElementById('laporanList');
+    window.renderLaporan = function(){
+      const filterTanggal = val('filterTanggal');
+      const filterShift = val('filterShift');
+      laporanListEl.innerHTML = '';
+      const dataUrut = Object.entries(semuaLaporan).sort((a,b) => b[0].localeCompare(a[0]));
+      let ada = false;
+      for(const [tanggal, perTanggal] of dataUrut){
+        if(filterTanggal && tanggal !== filterTanggal) continue;
+        for(const [key, item] of Object.entries(perTanggal).reverse()){
+          if(filterShift && item.shift !== filterShift) continue;
+          ada = true;
+          const card = document.createElement('div'); card.className = 'card';
+          const time = item.waktu ? new Date(item.waktu).toLocaleString('id-ID') : '';
+          card.innerHTML = `<p class="small muted"><strong>${tanggal} - Shift ${item.shift}</strong> | ${time}</p>
+            <pre style="white-space:pre-wrap; font-size:13px;">${item.teks}</pre>
+            <div style="display:flex;gap:8px">
+              <button class="btn ghost" onclick='copyServerText(${JSON.stringify(tanggal)}, "${key}")'>Salin</button>
+              <button class="btn ghost" onclick='downloadServerJSON(${JSON.stringify(tanggal)}, "${key}")'>Download JSON</button>
+              <button class="btn danger" onclick='hapusEntryFirebase(${JSON.stringify(tanggal)}, "${key}")'>Hapus (server)</button>
+            </div>`;
+          laporanListEl.appendChild(card);
+        }
+      }
+      if(!ada) laporanListEl.innerHTML = '<p class="muted">Tidak ada laporan yang sesuai dengan filter.</p>';
+    }
+
+    // helper: copy server text
+    window.copyServerText = function(tanggal, key){
+      const item = (semuaLaporan[tanggal]||{})[key];
+      if(!item){ alert('Tidak ditemukan'); return; }
+      navigator.clipboard.writeText(item.teks || JSON.stringify(item.formData)).then(()=>alert('📋 Disalin'));
+    }
+
+    window.downloadServerJSON = function(tanggal, key){
+      const item = (semuaLaporan[tanggal]||{})[key];
+      if(!item){ alert('Tidak ditemukan'); return; }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(item, null, 2));
+      const a = document.createElement('a'); a.href = dataStr; a.download = `laporan_${tanggal}_${key}.json`; document.body.appendChild(a); a.click(); a.remove();
+    }
+
+    // Hapus satu entry (server) — meminta auth server-side? Here we do client-side prompt and then remove node.
+    window.hapusEntryFirebase = function(tanggal, key){
+      const user = prompt('Username untuk hapus (server):');
+      const pass = prompt('Password:');
+      if(user !== 'Tirta' || pass !== 'Komunitas'){ alert('❌ Username/Password salah!'); return; }
+      if(!confirm('Hapus laporan ini dari server?')) return;
+      const itemRef = ref(db, `laporan/${tanggal}/${key}`);
+      remove(itemRef).then(()=>{ alert('🗑 Laporan dihapus dari server.'); }).catch(err=>{ alert('❌ Gagal hapus: '+err.message); });
+    }
+
+    // Hapus laporan berdasarkan tanggal & shift (semua entries di tanggal tersebut yang shift cocok)
+    window.hapusLaporan = function(){
+      const tanggal = val('tanggal');
+      if(!tanggal){ alert('⚠️ Isi tanggal yang ingin dihapus (pada input tanggal)'); return; }
+      const shift = val('shift');
+      const user = prompt('Username untuk hapus (server):');
+      const pass = prompt('Password:');
+      if(user !== 'Tirta' || pass !== 'Komunitas'){ alert('❌ Username/Password salah!'); return; }
+      if(!confirm(`Hapus semua laporan tanggal ${tanggal} shift ${shift} dari server?`)) return;
+
+      const refTanggal = ref(db, `laporan/${tanggal}`);
+      // iterate semua anak dan remove yang cocok shift
+      onValue(refTanggal, (snap) => {
+        const data = snap.val();
+        if(!data){ alert('Tidak ada laporan pada tanggal tersebut.'); return; }
+        let removed = 0;
+        Object.entries(data).forEach(([k,v]) => {
+          if(v && v.shift === shift){
+            remove(ref(db, `laporan/${tanggal}/${k}`)).then(()=>{}).catch(()=>{});
+            removed++;
+          }
+        });
+        alert(`🗑 Mengirim perintah hapus ke server untuk ${removed} item (jika ada).`);
+      }, { onlyOnce: true });
+    }
+
+    // Listener real-time
+    onValue(ref(db, 'laporan'), (snapshot) => {
+      semuaLaporan = snapshot.val() || {};
+      renderLaporan();
+    });
+
+    // restore draft and theme
+    function restore(){
+      try{
+        const d = JSON.parse(localStorage.getItem('laporan_draft')||'{}');
+        Object.keys(d).forEach(k => { const el = document.getElementById(k); if(el) el.value = d[k]; });
+      }catch(e){}
+      if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+      // set tanggal default = today if empty
+      const tEl = document.getElementById('tanggal'); if(tEl && !tEl.value) tEl.valueAsDate = new Date();
+    }
+    restore();
+
+    // live update: update badges when slitting inputs change
+    ['slit_mr2','reject_produksi2','reject_ncp2','slit_mr3','reject_produksi3','reject_ncp3'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.addEventListener('input', ()=> { updateOEEPreview(2); updateOEEPreview(3); });
+    });
+
+  </script>
 </body>
 </html>
