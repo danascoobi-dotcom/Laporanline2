@@ -1,144 +1,236 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Laporan Produksi Harian</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Laporan Shift A (Final)</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
-    h2 { background: #343a40; color: white; padding: 10px; border-radius: 6px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: white; }
-    th, td { border: 1px solid #dee2e6; padding: 8px; text-align: center; }
-    th { background: #e9ecef; }
-    .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
-    .btn-save { background: #28a745; color: white; }
-    .btn-delete { background: #dc3545; color: white; }
-    .btn-login { background: #007bff; color: white; }
+    :root{
+      --bg:#f6f7f9; --card:#ffffff; --ink:#1f2937; --muted:#64748b; --line:#e5e7eb; --accent:#25d366; --danger:#ef4444;
+    }
+    .dark{
+      --bg:#0f1115; --card:#141821; --ink:#e5e7eb; --muted:#a0aec0; --line:#2d3748;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--ink);}
+    .wrap{max-width:900px; margin:24px auto; padding:16px;}
+    h2{margin:0 0 12px}
+    .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    label{font-weight:600; display:block; margin-top:10px}
+    .hint{font-size:12px; color:var(--muted); margin-top:4px}
+    input, textarea, select{
+      width:100%; padding:10px 12px; margin-top:6px; border-radius:10px; border:1px solid var(--line); background:#fff; font:inherit;
+    }
+    textarea{min-height:84px; resize:vertical}
+    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+    @media (max-width:640px){ .grid-2, .grid-3{grid-template-columns:1fr} }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 14px; border-radius:8px; border:1px solid var(--line); background:var(--accent); color:#fff; font-weight:700; cursor:pointer;
+    }
+    .btn.secondary{background:#111827}
+    .btn.danger{background:var(--danger)}
+    .btn.ghost{background:transparent; color:var(--ink)}
+    .stack{display:grid; gap:12px}
+    pre{
+      background:#fff; border:1px dashed var(--line); border-radius:12px; padding:14px; white-space:pre-wrap; min-height:140px;
+    }
+    .oee-preview{margin-top:10px; padding:10px; background:#fff; border:1px dashed var(--line); border-radius:10px; font-size:14px}
+    .bar{height:10px; border-radius:999px; overflow:hidden; background:#e5e7eb; margin-top:4px;}
+    .bar span{display:block; height:100%; background:linear-gradient(90deg,#16a34a,#22c55e); width:0%;}
+    .muted{font-size:12px; color:var(--muted)}
   </style>
 </head>
 <body>
+<div class="wrap">
+  <h2>Laporan Shift A – Final</h2>
+  <div class="stack">
+    <div class="grid-3">
+      <div>
+        <label>Tanggal</label>
+        <input type="date" id="tanggal">
+      </div>
+      <div>
+        <label>Nama Produk</label>
+        <input type="text" id="produk" value="PTWCJ-HLD-003">
+      </div>
+      <div>
+        <label>Shift</label>
+        <select id="shift">
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+        </select>
+      </div>
+    </div>
 
-  <h2>Laporan Produksi Harian</h2>
+    <!-- Contoh LINE 2 -->
+    <div class="card">
+      <h3>LINE 2</h3>
+      <div class="grid-3">
+        <div><label>Pulp Tank 205</label><input type="number" id="pulp205_2"></div>
+        <div><label>Vitacel Mix A</label><input type="number" id="vit2a"></div>
+        <div><label>Vitacel Mix B</label><input type="number" id="vit2b"></div>
+        <div><label>Vitacel Standby</label><input type="number" id="vit2s"></div>
+        <div><label>Adhesive Standby</label><input type="number" id="adh2s"></div>
+        <div><label>Adhesive di Tangki</label><input type="number" id="adh2t"></div>
+        <div><label>CMC</label><input type="number" id="cmc2"></div>
+        <div><label>Recycle (set)</label><input type="number" id="rec2"></div>
+        <div><label>Recycle per set (kg)</label><input type="number" id="rec2w"></div>
+        <div><label>Mother Roll</label><input type="number" id="mr2"></div>
+        <div><label>Total Berat FG (kg)</label><input type="number" id="fg2"></div>
+      </div>
+      <div class="grid-2">
+        <div><label>Jumlah MR (Slitting)</label><input type="number" id="slit_total2"><div class="hint">Total bobin slitting</div></div>
+        <div><label>Bobin Reject Produksi (pcs)</label><input type="number" id="reject_produksi2"></div>
+        <div><label>Bobin Reject NCP (pcs)</label><input type="number" id="reject_ncp2"></div>
+      </div>
+      <div class="oee-preview">
+        📈 OEE Line 2: <b><span id="oee2">-</span></b>
+        <div class="bar"><span id="bar2"></span></div>
+      </div>
+    </div>
 
-  <!-- Preparation -->
-  <h3>Preparation</h3>
-  <table>
-    <tr><th>Item</th><th>Jumlah</th></tr>
-    <tr><td>Bobin</td><td><input type="number" id="prep_bobin"></td></tr>
-    <tr><td>Reject</td><td><input type="number" id="prep_reject"></td></tr>
-  </table>
+    <!-- LINE 3 -->
+    <div class="card">
+      <h3>LINE 3</h3>
+      <div class="grid-3">
+        <div><label>Pulp Tank 204</label><input type="number" id="pulp204_3"></div>
+        <div><label>Vitacel Mix A</label><input type="number" id="vit3a"></div>
+        <div><label>Vitacel Mix B</label><input type="number" id="vit3b"></div>
+        <div><label>Vitacel Standby</label><input type="number" id="vit3s"></div>
+        <div><label>Adhesive Standby</label><input type="number" id="adh3s"></div>
+        <div><label>Adhesive di Tangki</label><input type="number" id="adh3t"></div>
+        <div><label>CMC</label><input type="number" id="cmc3"></div>
+        <div><label>Recycle (set)</label><input type="number" id="rec3"></div>
+        <div><label>Recycle per set (kg)</label><input type="number" id="rec3w"></div>
+        <div><label>Mother Roll</label><input type="number" id="mr3"></div>
+        <div><label>Total Berat FG (kg)</label><input type="number" id="fg3"></div>
+      </div>
+      <div class="grid-2">
+        <div><label>Jumlah MR (Slitting)</label><input type="number" id="slit_total3"><div class="hint">Total bobin slitting</div></div>
+        <div><label>Bobin Reject Produksi (pcs)</label><input type="number" id="reject_produksi3"></div>
+        <div><label>Bobin Reject NCP (pcs)</label><input type="number" id="reject_ncp3"></div>
+      </div>
+      <div class="oee-preview">
+        📈 OEE Line 3: <b><span id="oee3">-</span></b>
+        <div class="bar"><span id="bar3"></span></div>
+      </div>
+    </div>
 
-  <!-- Pulp -->
-  <h3>Pulp</h3>
-  <table>
-    <tr><th>Item</th><th>Jumlah</th></tr>
-    <tr><td>Pulp Masuk</td><td><input type="number" id="pulp_in"></td></tr>
-    <tr><td>Pulp Keluar</td><td><input type="number" id="pulp_out"></td></tr>
-  </table>
+    <div class="card">
+      <div class="grid-2">
+        <div><label>Pulp Standby Tank 203</label><input type="number" id="pulp203"></div>
+        <div><label>Catatan untuk Shift Selanjutnya</label><textarea id="catatan"></textarea></div>
+      </div>
+    </div>
 
-  <!-- Finish Good -->
-  <h3>Finish Good</h3>
-  <table>
-    <tr><th>Item</th><th>Jumlah</th></tr>
-    <tr><td>Jumlah FG</td><td><input type="number" id="fg_jumlah"></td></tr>
-    <tr><td>Reject FG</td><td><input type="number" id="fg_reject"></td></tr>
-  </table>
+    <div class="grid-2">
+      <button class="btn" onclick="previewLaporan()">Tampilkan & Simpan Lokal</button>
+      <button class="btn secondary" onclick="copyText()">Salin Teks</button>
+      <button class="btn ghost" onclick="shareWA()">Kirim WA</button>
+      <button class="btn danger" onclick="clearData()">Bersihkan Form</button>
+      <button class="btn ghost" onclick="toggleTheme()">🌙 Mode</button>
+      <button class="btn" onclick="saveToServer()">💾 Simpan ke Server</button>
+      <button class="btn danger" onclick="hapusLaporan()">🗑 Hapus Laporan</button>
+    </div>
 
-  <!-- Cylinder -->
-  <h3>Cylinder</h3>
-  <table>
-    <tr><th>Item</th><th>Jumlah</th></tr>
-    <tr><td>Cylinder Masuk</td><td><input type="number" id="cyl_in"></td></tr>
-    <tr><td>Cylinder Keluar</td><td><input type="number" id="cyl_out"></td></tr>
-  </table>
-
-  <!-- Slitting -->
-  <h3>Slitting</h3>
-  <table>
-    <tr><th>Item</th><th>Jumlah</th></tr>
-    <tr><td>Total Bobin</td><td><input type="number" id="slit_total"></td></tr>
-    <tr><td>Reject Produksi</td><td><input type="number" id="slit_reject"></td></tr>
-    <tr><td>Reject NCP</td><td><input type="number" id="slit_ncp"></td></tr>
-    <tr><td>Berat per Bobin (kg)</td><td><input type="number" id="slit_kg"></td></tr>
-  </table>
-  <button class="btn btn-save" onclick="hitungSlitting()">Hitung OEE</button>
-
-  <h4>Hasil Slitting</h4>
-  <table>
-    <tr><th>OKE</th><th>OEE (%)</th></tr>
-    <tr><td id="slit_oke">-</td><td id="slit_oee">-</td></tr>
-  </table>
-
-  <h2>Rekap Laporan Harian</h2>
-  <table id="rekapTable">
-    <tr>
-      <th>Bagian</th>
-      <th>Jumlah</th>
-      <th>Reject</th>
-      <th>OKE</th>
-      <th>OEE (%)</th>
-    </tr>
-    <tr><td>Preparation</td><td id="rekap_prep">-</td><td id="rekap_prep_rej">-</td><td>-</td><td>-</td></tr>
-    <tr><td>Pulp</td><td id="rekap_pulp">-</td><td>-</td><td>-</td><td>-</td></tr>
-    <tr><td>Finish Good</td><td id="rekap_fg">-</td><td id="rekap_fg_rej">-</td><td>-</td><td>-</td></tr>
-    <tr><td>Cylinder</td><td id="rekap_cyl">-</td><td>-</td><td>-</td><td>-</td></tr>
-    <tr><td>Slitting</td><td id="rekap_slit">-</td><td id="rekap_slit_rej">-</td><td id="rekap_slit_oke">-</td><td id="rekap_slit_oee">-</td></tr>
-  </table>
-
-  <button class="btn btn-save" onclick="simpanLaporan()">Simpan Laporan</button>
-  <button class="btn btn-delete" onclick="mintaLogin()">Hapus Laporan</button>
-
-  <!-- Modal Login -->
-  <div id="loginModal" style="display:none; background:#fff; border:1px solid #ccc; padding:20px;">
-    <h3>Login untuk Hapus</h3>
-    <label>Username: <input type="text" id="username"></label><br><br>
-    <label>Password: <input type="password" id="password"></label><br><br>
-    <button class="btn btn-login" onclick="hapusDenganLogin()">Login & Hapus</button>
+    <pre id="output"></pre>
   </div>
+</div>
 
-  <script>
-    function hitungSlitting() {
-      let total = parseInt(document.getElementById("slit_total").value) || 0;
-      let rejProd = parseInt(document.getElementById("slit_reject").value) || 0;
-      let rejNcp = parseInt(document.getElementById("slit_ncp").value) || 0;
+<script>
+  const nf = new Intl.NumberFormat('id-ID',{maximumFractionDigits:2});
 
-      let oke = total - rejProd - rejNcp;
-      if (oke < 0) oke = 0;
+  function n(id){return parseFloat(document.getElementById(id)?.value||0)}
 
-      // Rumus sederhana OEE dari total bobin
-      let quality = (oke / total) || 0;
-      let availability = 1; // diasumsikan tidak ada downtime
-      let performance = 1;  // diasumsikan sesuai target
-      let oee = availability * performance * quality * 100;
+  function calcOEE(total, rejectP, rejectN){
+    if(total<=0) return 0;
+    let good = Math.max(total - rejectP - rejectN,0);
+    let quality = good/total;
+    let availability = 1;
+    let performance = 1;
+    return availability*performance*quality*100;
+  }
 
-      document.getElementById("slit_oke").innerText = oke;
-      document.getElementById("slit_oee").innerText = oee.toFixed(2);
+  function updateOEE(line){
+    let total = n(`slit_total${line}`);
+    let rp = n(`reject_produksi${line}`);
+    let rn = n(`reject_ncp${line}`);
+    let oee = calcOEE(total,rp,rn);
+    document.getElementById(`oee${line}`).textContent = nf.format(oee)+"%";
+    document.getElementById(`bar${line}`).style.width = Math.min(oee,100)+"%";
+  }
 
-      document.getElementById("rekap_slit").innerText = total;
-      document.getElementById("rekap_slit_rej").innerText = rejProd + rejNcp;
-      document.getElementById("rekap_slit_oke").innerText = oke;
-      document.getElementById("rekap_slit_oee").innerText = oee.toFixed(2);
+  function narasi(line){
+    let t = `\n\n---\n\nLINE ${line}\n\nPersiapan Produksi:\n`;
+    if(n(`pulp205_${line}`)||n(`pulp204_${line}`)) t+=`- Pulp Tank: ${n(`pulp205_${line}`)||n(`pulp204_${line}`)} set\n`;
+    if(n(`vit${line}a`)) t+=`- Vitacel A: ${n(`vit${line}a`)} set\n`;
+    if(n(`vit${line}b`)) t+=`- Vitacel B: ${n(`vit${line}b`)} set\n`;
+    if(n(`vit${line}s`)) t+=`- Vitacel Standby: ${n(`vit${line}s`)} set\n`;
+    if(n(`adh${line}s`)) t+=`- Adhesive Standby: ${n(`adh${line}s`)} set\n`;
+    if(n(`adh${line}t`)) t+=`- Adhesive Tangki: ${n(`adh${line}t`)} set\n`;
+    if(n(`cmc${line}`)) t+=`- CMC: ${n(`cmc${line}`)} set\n`;
+    if(n(`rec${line}`)&&n(`rec${line}w`)) t+=`- Recycle: ${n(`rec${line}`)} set (${n(`rec${line}w`)} kg/set)\n`;
+    t+=`\nFinish Good:\n`;
+    if(n(`mr${line}`)) t+=`- Mother Roll: ${n(`mr${line}`)} MR\n`;
+    if(n(`fg${line}`)) t+=`- Berat FG: ${n(`fg${line}`)} kg\n`;
+
+    const total=n(`slit_total${line}`), rp=n(`reject_produksi${line}`), rn=n(`reject_ncp${line}`);
+    let good = Math.max(total-rp-rn,0);
+    t+=`\nSlitting:\n- Slitting: ${total} bobin\n- Reject Produksi: ${rp} bobin\n- Reject NCP: ${rn} bobin\n- OKE: ${good} bobin (${good*15} kg)\n`;
+    t+=`\n📈 OEE: ${nf.format(calcOEE(total,rp,rn))}%\n`;
+    return t;
+  }
+
+  function previewLaporan(){
+    let isi = `LAPORAN SHIFT ${document.getElementById("shift").value}\nTanggal: ${document.getElementById("tanggal").value}\nProduk: ${document.getElementById("produk").value}`;
+    isi+=narasi(2); isi+=narasi(3);
+    if(n("pulp203") || document.getElementById("catatan").value){
+      isi+=`\n\nCatatan Tambahan:\n`;
+      if(n("pulp203")) isi+=`- Pulp 203: ${n("pulp203")} set\n`;
+      if(document.getElementById("catatan").value) isi+=`- ${document.getElementById("catatan").value}\n`;
     }
+    document.getElementById("output").innerText=isi;
+    updateOEE(2); updateOEE(3);
+  }
 
-    function simpanLaporan() {
-      alert("Laporan berhasil disimpan (simulasi).");
-    }
+  function copyText(){let t=document.getElementById('output').innerText; if(!t.trim()){alert('Laporan kosong!'); return;} navigator.clipboard.writeText(t).then(()=>alert('📋 Laporan disalin ke clipboard'))}
+  function shareWA(){let t=document.getElementById('output').innerText||''; if(!t.trim()){previewLaporan(); t=document.getElementById('output').innerText;} window.open(`https://wa.me/?text=${encodeURIComponent(t)}`,'_blank')}
+  function clearData(){if(!confirm('Hapus semua data di form?'))return; document.querySelectorAll('input,textarea,select').forEach(el=>el.value=''); document.getElementById('output').innerText=''}
 
-    function mintaLogin() {
-      document.getElementById("loginModal").style.display = "block";
-    }
+  function toggleTheme(){document.body.classList.toggle('dark')}
 
-    function hapusDenganLogin() {
-      let user = document.getElementById("username").value;
-      let pass = document.getElementById("password").value;
+  // Server save/delete
+  function saveToServer(){
+    let data={};
+    document.querySelectorAll("input,textarea,select").forEach(el=>{data[el.id]=el.value});
+    fetch("save_laporan.php",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(data)
+    })
+    .then(r=>r.text())
+    .then(res=>alert("✅ "+res))
+    .catch(err=>alert("❌ Gagal simpan: "+err));
+  }
 
-      if (user === "Tirta" && pass === "Komunitas") {
-        document.getElementById("rekapTable").innerHTML = "";
-        alert("Laporan berhasil dihapus.");
-        document.getElementById("loginModal").style.display = "none";
-      } else {
-        alert("Username atau password salah!");
-      }
-    }
-  </script>
+  function hapusLaporan(){
+    let user = prompt("Masukkan Username:");
+    let pass = prompt("Masukkan Password:");
+    if(user!=="Tirta"||pass!=="Komunitas"){alert("❌ Username/Password salah!"); return;}
+    let tanggal=document.getElementById("tanggal").value;
+    if(!tanggal){alert("⚠️ Tanggal wajib diisi!"); return;}
+    fetch("delete_laporan.php",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({tanggal})
+    })
+    .then(r=>r.text())
+    .then(res=>alert("🗑 "+res))
+    .catch(err=>alert("❌ Gagal hapus: "+err));
+  }
+</script>
 </body>
 </html>
