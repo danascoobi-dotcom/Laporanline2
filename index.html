@@ -1,247 +1,175 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Laporan Shift A (Final)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Laporan Shift A — OEE Global</title>
   <style>
     :root{
-      --bg:#f6f7f9; --card:#ffffff; --ink:#1f2937; --muted:#64748b; --line:#e5e7eb; --accent:#25d366; --danger:#ef4444;
+      --bg:#f6f7f9; --card:#fff; --ink:#111827; --muted:#64748b; --line:#e5e7eb; --accent:#10b981; --danger:#ef4444;
     }
-    .dark{
-      --bg:#0f1115; --card:#141821; --ink:#e5e7eb; --muted:#a0aec0; --line:#2d3748;
-    }
-    *{box-sizing:border-box}
-    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--ink);}
-    .wrap{max-width:900px; margin:24px auto; padding:16px;}
-    h2{margin:0 0 12px}
-    .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; box-shadow:0 1px 2px rgba(0,0,0,.04)}
-    label{font-weight:600; display:block; margin-top:10px}
-    .hint{font-size:12px; color:var(--muted); margin-top:4px}
-    input, textarea, select{
-      width:100%; padding:10px 12px; margin-top:6px; border-radius:10px; border:1px solid var(--line); background:#fff; font:inherit;
-    }
-    textarea{min-height:84px; resize:vertical}
-    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
-    @media (max-width:640px){ .grid-2, .grid-3{grid-template-columns:1fr} }
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding:10px 14px; border-radius:8px; border:1px solid var(--line); background:var(--accent); color:#fff; font-weight:700; cursor:pointer;
-    }
-    .btn.secondary{background:#111827}
+    body{font-family:system-ui,Segoe UI,Roboto,Arial; margin:0; background:var(--bg); color:var(--ink)}
+    .wrap{max-width:960px;margin:24px auto;padding:16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:640px){.grid-3,.grid-2{grid-template-columns:1fr}}
+    label{display:block;font-weight:700;margin-bottom:4px}
+    input,textarea,select{width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);font:inherit}
+    textarea{min-height:84px}
+    .btn{padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
     .btn.danger{background:var(--danger)}
-    .btn.ghost{background:transparent; color:var(--ink)}
-    .stack{display:grid; gap:12px}
-    pre{
-      background:#fff; border:1px dashed var(--line); border-radius:12px; padding:14px; white-space:pre-wrap; min-height:140px;
-    }
-    .oee-preview{margin-top:10px; padding:10px; background:#fff; border:1px dashed var(--line); border-radius:10px; font-size:14px}
-    .bar{height:10px; border-radius:999px; overflow:hidden; background:#e5e7eb; margin-top:4px;}
-    .bar span{display:block; height:100%; background:linear-gradient(90deg,#16a34a,#22c55e); width:0%;}
-    .muted{font-size:12px; color:var(--muted)}
+    pre{white-space:pre-wrap;background:#fff;border:1px dashed var(--line);padding:12px;border-radius:10px;min-height:120px}
+    .oee-preview{display:flex;align-items:center;gap:12px;margin-top:8px}
+    .oee-badge{background:#ecfdf5;color:#065f46;padding:6px 10px;border-radius:999px;font-weight:700}
+    .bar{height:10px;border-radius:999px;background:#e5e7eb;flex:1;overflow:hidden}
+    .bar span{height:100%;display:block;background:linear-gradient(90deg,#16a34a,#22c55e);width:0%}
+    .muted{color:var(--muted);font-size:13px}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h2>Laporan Shift A – Final</h2>
-  <div class="stack">
+  <h2>Laporan Shift A — Final</h2>
+
+  <div class="card">
     <div class="grid-3">
-      <div>
-        <label>Tanggal</label>
-        <input type="date" id="tanggal">
-      </div>
-      <div>
-        <label>Nama Produk</label>
-        <input type="text" id="produk" value="PTWCJ-HLD-003">
-      </div>
-      <div>
-        <label>Shift</label>
-        <select id="shift">
-          <option value="A">A</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
-        </select>
+      <div><label>Tanggal</label><input type="date" id="tanggal"></div>
+      <div><label>Nama Produk</label><input type="text" id="produk" value="PTWCJ-HLD-003"></div>
+      <div><label>Shift</label>
+        <select id="shift"><option>A</option><option>B</option><option>C</option></select>
       </div>
     </div>
-
-    <!-- LINE 2 -->
-    <div class="card">
-      <h3>LINE 2</h3>
-      <div class="grid-3">
-        <div><label>Pulp Tank 205</label><input type="number" id="pulp205_2"></div>
-        <div><label>Vitacel Mix A</label><input type="number" id="vit2a"></div>
-        <div><label>Vitacel Mix B</label><input type="number" id="vit2b"></div>
-        <div><label>Vitacel Standby</label><input type="number" id="vit2s"></div>
-        <div><label>Adhesive Standby</label><input type="number" id="adh2s"></div>
-        <div><label>Adhesive di Tangki</label><input type="number" id="adh2t"></div>
-        <div><label>CMC</label><input type="number" id="cmc2"></div>
-        <div><label>Recycle (set)</label><input type="number" id="rec2"></div>
-        <div><label>Recycle per set (kg)</label><input type="number" id="rec2w"></div>
-        <div><label>Mother Roll</label><input type="number" id="mr2"></div>
-        <div><label>Total Berat FG (kg)</label><input type="number" id="fg2"></div>
-      </div>
-      <div class="grid-2">
-        <div><label>Jumlah MR (Slitting)</label><input type="number" id="slit_mr2"><div class="hint">1 MR = 6 bobin</div></div>
-        <div><label>Bobin Reject Produksi (pcs)</label><input type="number" id="reject_produksi2"></div>
-        <div><label>Bobin Reject NCP (pcs)</label><input type="number" id="reject_ncp2"></div>
-      </div>
-      <div class="oee-preview">
-        📈 OEE Line 2: <b><span id="oee2">-</span></b>
-        <div class="bar"><span id="bar2"></span></div>
-      </div>
-    </div>
-
-    <!-- LINE 3 -->
-    <div class="card">
-      <h3>LINE 3</h3>
-      <div class="grid-3">
-        <div><label>Pulp Tank 204</label><input type="number" id="pulp204_3"></div>
-        <div><label>Vitacel Mix A</label><input type="number" id="vit3a"></div>
-        <div><label>Vitacel Mix B</label><input type="number" id="vit3b"></div>
-        <div><label>Vitacel Standby</label><input type="number" id="vit3s"></div>
-        <div><label>Adhesive Standby</label><input type="number" id="adh3s"></div>
-        <div><label>Adhesive di Tangki</label><input type="number" id="adh3t"></div>
-        <div><label>CMC</label><input type="number" id="cmc3"></div>
-        <div><label>Recycle (set)</label><input type="number" id="rec3"></div>
-        <div><label>Recycle per set (kg)</label><input type="number" id="rec3w"></div>
-        <div><label>Mother Roll</label><input type="number" id="mr3"></div>
-        <div><label>Total Berat FG (kg)</label><input type="number" id="fg3"></div>
-      </div>
-      <div class="grid-2">
-        <div><label>Jumlah MR (Slitting)</label><input type="number" id="slit_mr3"><div class="hint">1 MR = 6 bobin</div></div>
-        <div><label>Bobin Reject Produksi (pcs)</label><input type="number" id="reject_produksi3"></div>
-        <div><label>Bobin Reject NCP (pcs)</label><input type="number" id="reject_ncp3"></div>
-      </div>
-      <div class="oee-preview">
-        📈 OEE Line 3: <b><span id="oee3">-</span></b>
-        <div class="bar"><span id="bar3"></span></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="grid-2">
-        <div><label>Pulp Standby Tank 203</label><input type="number" id="pulp203"></div>
-        <div><label>Catatan untuk Shift Selanjutnya</label><textarea id="catatan"></textarea></div>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <button class="btn" onclick="previewLaporan()">Tampilkan & Simpan Lokal</button>
-      <button class="btn secondary" onclick="copyText()">Salin Teks</button>
-      <button class="btn ghost" onclick="shareWA()">Kirim WA</button>
-      <button class="btn danger" onclick="clearData()">Bersihkan Form</button>
-      <button class="btn ghost" onclick="toggleTheme()">🌙 Mode</button>
-      <button class="btn" onclick="saveToServer()">💾 Simpan ke Server</button>
-      <button class="btn danger" onclick="hapusLaporan()">🗑 Hapus Laporan</button>
-    </div>
-
-    <pre id="output"></pre>
   </div>
+
+  <!-- LINE 2 -->
+  <div class="card">
+    <h3>LINE 2</h3>
+    <div class="grid-3">
+      <div><label>Pulp Tank 205</label><input id="pulp205_2" type="number"></div>
+      <div><label>Vitacel A</label><input id="vit2a" type="number"></div>
+      <div><label>Vitacel B</label><input id="vit2b" type="number"></div>
+      <div><label>Vitacel Standby</label><input id="vit2s" type="number"></div>
+      <div><label>Adhesive Standby</label><input id="adh2s" type="number"></div>
+      <div><label>Adhesive Tangki</label><input id="adh2t" type="number"></div>
+      <div><label>CMC</label><input id="cmc2" type="number"></div>
+      <div><label>Recycle (set)</label><input id="rec2" type="number"></div>
+      <div><label>Recycle per set (kg)</label><input id="rec2w" type="number"></div>
+      <div><label>Mother Roll</label><input id="mr2" type="number"></div>
+      <div><label>Berat FG (kg)</label><input id="fg2" type="number"></div>
+    </div>
+    <div class="grid-2" style="margin-top:10px">
+      <div><label>Jumlah MR (Slitting)</label><input id="slit_mr2" type="number"><div class="muted">1 MR=6 bobin</div></div>
+      <div><label>Reject Produksi (pcs)</label><input id="reject_produksi2" type="number">
+           <label>Reject NCP (pcs)</label><input id="reject_ncp2" type="number"></div>
+    </div>
+    <div class="oee-preview"><div class="oee-badge" id="oee2">-</div><div class="bar"><span id="bar2"></span></div></div>
+  </div>
+
+  <!-- LINE 3 -->
+  <div class="card">
+    <h3>LINE 3</h3>
+    <div class="grid-3">
+      <div><label>Pulp Tank 204</label><input id="pulp204_3" type="number"></div>
+      <div><label>Vitacel A</label><input id="vit3a" type="number"></div>
+      <div><label>Vitacel B</label><input id="vit3b" type="number"></div>
+      <div><label>Vitacel Standby</label><input id="vit3s" type="number"></div>
+      <div><label>Adhesive Standby</label><input id="adh3s" type="number"></div>
+      <div><label>Adhesive Tangki</label><input id="adh3t" type="number"></div>
+      <div><label>CMC</label><input id="cmc3" type="number"></div>
+      <div><label>Recycle (set)</label><input id="rec3" type="number"></div>
+      <div><label>Recycle per set (kg)</label><input id="rec3w" type="number"></div>
+      <div><label>Mother Roll</label><input id="mr3" type="number"></div>
+      <div><label>Berat FG (kg)</label><input id="fg3" type="number"></div>
+    </div>
+    <div class="grid-2" style="margin-top:10px">
+      <div><label>Jumlah MR (Slitting)</label><input id="slit_mr3" type="number"><div class="muted">1 MR=6 bobin</div></div>
+      <div><label>Reject Produksi (pcs)</label><input id="reject_produksi3" type="number">
+           <label>Reject NCP (pcs)</label><input id="reject_ncp3" type="number"></div>
+    </div>
+    <div class="oee-preview"><div class="oee-badge" id="oee3">-</div><div class="bar"><span id="bar3"></span></div></div>
+  </div>
+
+  <div class="card">
+    <div class="grid-2">
+      <div><label>Pulp Standby 203</label><input id="pulp203" type="number"></div>
+      <div><label>Catatan</label><textarea id="catatan"></textarea></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+    <button class="btn" onclick="previewLaporan()">Tampilkan</button>
+    <button class="btn ghost" onclick="copyText()">Salin</button>
+  </div>
+
+  <div class="card"><pre id="output"></pre></div>
 </div>
 
 <script>
-  const nf = new Intl.NumberFormat('id-ID',{maximumFractionDigits:2});
-  function n(id){return parseFloat(document.getElementById(id)?.value||0)}
+const SPEED=15, WIDTH=1.2, GSM=0.095, TIME=480, KG_PER_BOBIN=15, MR2BOB=6;
+const nf=new Intl.NumberFormat('id-ID',{maximumFractionDigits:2});
 
-  function calcOEE(total, rejectP, rejectN){
-    if(total<=0) return 0;
-    let good = Math.max(total - rejectP - rejectN,0);
-    return (good/total)*100; // Avail & Perf dianggap 100%
+function g(id){return document.getElementById(id).value;}
+function n(id){return parseFloat(g(id))||0;}
+function isFilledLine(line){
+  return ["pulp205_"+line,"pulp204_"+line,"vit"+line+"a","vit"+line+"b","vit"+line+"s",
+          "adh"+line+"s","adh"+line+"t","cmc"+line,"rec"+line,"rec"+line+"w","mr"+line,
+          "fg"+line,"slit_mr"+line,"reject_produksi"+line,"reject_ncp"+line]
+    .some(id=>document.getElementById(id)&&g(id)!=="");
+}
+function computeOEE(total,good){
+  const actKg=total*KG_PER_BOBIN, theo=SPEED*WIDTH*GSM*TIME;
+  const perf=theo>0?actKg/theo:0, qual=total>0?good/total:0;
+  return perf*qual*100;
+}
+function lineReport(line){
+  if(!isFilledLine(line)) return "";
+  let t=`\n\n---\n\nLINE ${line}\n`;
+  if(n("pulp205_"+line)||n("pulp204_"+line))t+=`- Pulp Tank: ${n("pulp205_"+line)||n("pulp204_"+line)} set\n`;
+  if(n("vit"+line+"a"))t+=`- Vitacel A: ${n("vit"+line+"a")} set\n`;
+  if(n("vit"+line+"b"))t+=`- Vitacel B: ${n("vit"+line+"b")} set\n`;
+  if(n("vit"+line+"s"))t+=`- Vitacel Standby: ${n("vit"+line+"s")} set\n`;
+  if(n("adh"+line+"s"))t+=`- Adhesive Standby: ${n("adh"+line+"s")} set\n`;
+  if(n("adh"+line+"t"))t+=`- Adhesive Tangki: ${n("adh"+line+"t")} set\n`;
+  if(n("cmc"+line))t+=`- CMC: ${n("cmc"+line)} set\n`;
+  if(n("rec"+line)&&n("rec"+line+"w"))t+=`- Recycle: ${n("rec"+line)} set (${n("rec"+line+"w")} kg/set)\n`;
+  if(n("mr"+line))t+=`- Mother Roll: ${n("mr"+line)} MR\n`;
+  if(n("fg"+line))t+=`- Berat FG: ${n("fg"+line)} kg\n`;
+  const mr=n("slit_mr"+line), total=mr*MR2BOB, rp=n("reject_produksi"+line), rn=n("reject_ncp"+line), good=Math.max(total-rp-rn,0);
+  if(total>0){
+    t+=`\nSlitting:\n- Slitting: ${total} bobin\n`;
+    if(rp>0)t+=`- Reject Produksi: ${rp} bobin\n`;
+    if(rn>0)t+=`- Reject NCP: ${rn} bobin\n`;
+    t+=`- OKE: ${good} bobin (${good*KG_PER_BOBIN} kg)\n`;
+    t+=`\n📈 OEE: ${nf.format(computeOEE(total,good))}%\n`;
   }
-
-  function updateOEE(line){
-    let total = n(`slit_mr${line}`)*6;
-    let rp = n(`reject_produksi${line}`);
-    let rn = n(`reject_ncp${line}`);
-    let oee = calcOEE(total,rp,rn);
-    document.getElementById(`oee${line}`).textContent = oee? nf.format(oee)+"%":"-";
-    document.getElementById(`bar${line}`).style.width = Math.min(oee,100)+"%";
+  return t;
+}
+function previewLaporan(){
+  let isi=`LAPORAN SHIFT ${g("shift")}\nTanggal: ${g("tanggal")}\nProduk: ${g("produk")}`;
+  isi+=lineReport(2);
+  isi+=lineReport(3);
+  if(n("pulp203")||g("catatan")){
+    isi+=`\n\nCatatan Tambahan:\n`;
+    if(n("pulp203"))isi+=`- Pulp 203: ${n("pulp203")} set\n`;
+    if(g("catatan"))isi+=`- ${g("catatan")}\n`;
   }
-
-  function narasi(line){
-    let parts=[];
-    if(n(`pulp205_${line}`)||n(`pulp204_${line}`)) parts.push(`- Pulp Tank: ${n(`pulp205_${line}`)||n(`pulp204_${line}`)} set`);
-    if(n(`vit${line}a`)) parts.push(`- Vitacel A: ${n(`vit${line}a`)} set`);
-    if(n(`vit${line}b`)) parts.push(`- Vitacel B: ${n(`vit${line}b`)} set`);
-    if(n(`vit${line}s`)) parts.push(`- Vitacel Standby: ${n(`vit${line}s`)} set`);
-    if(n(`adh${line}s`)) parts.push(`- Adhesive Standby: ${n(`adh${line}s`)} set`);
-    if(n(`adh${line}t`)) parts.push(`- Adhesive Tangki: ${n(`adh${line}t`)} set`);
-    if(n(`cmc${line}`)) parts.push(`- CMC: ${n(`cmc${line}`)} set`);
-    if(n(`rec${line}`)&&n(`rec${line}w`)) parts.push(`- Recycle: ${n(`rec${line}`)} set (${n(`rec${line}w`)} kg/set)`);
-
-    let fg=[];
-    if(n(`mr${line}`)) fg.push(`- Mother Roll: ${n(`mr${line}`)} MR`);
-    if(n(`fg${line}`)) fg.push(`- Berat FG: ${n(`fg${line}`)} kg`);
-
-    let total=n(`slit_mr${line}`)*6, rp=n(`reject_produksi${line}`), rn=n(`reject_ncp${line}`);
-    let slitting=[];
-    if(total||rp||rn){
-      let good=Math.max(total-rp-rn,0);
-      slitting.push(`- Slitting: ${total} bobin`);
-      if(rp) slitting.push(`- Reject Produksi: ${rp} bobin`);
-      if(rn) slitting.push(`- Reject NCP: ${rn} bobin`);
-      slitting.push(`- OKE: ${good} bobin (${good*15} kg)`);
-      slitting.push(`📈 OEE: ${nf.format(calcOEE(total,rp,rn))}%`);
+  document.getElementById("output").innerText=isi;
+  // reset OEE badge jika kosong
+  [2,3].forEach(line=>{
+    const badge=document.getElementById("oee"+line), bar=document.getElementById("bar"+line);
+    if(!isFilledLine(line)){badge.textContent="-";bar.style.width="0%";}
+    else {
+      const mr=n("slit_mr"+line), total=mr*MR2BOB, good=Math.max(total-n("reject_produksi"+line)-n("reject_ncp"+line),0);
+      const oee=computeOEE(total,good);badge.textContent=nf.format(oee)+"%";bar.style.width=Math.min(oee,100)+"%";
     }
-
-    if(parts.length||fg.length||slitting.length){
-      let text=`\n\n---\n\nLINE ${line}\n`;
-      if(parts.length){text+=`\nPersiapan Produksi:\n${parts.join("\n")}\n`;}
-      if(fg.length){text+=`\nFinish Good:\n${fg.join("\n")}\n`;}
-      if(slitting.length){text+=`\nSlitting:\n${slitting.join("\n")}\n`;}
-      return text;
-    }
-    return "";
-  }
-
-  function previewLaporan(){
-    let isi=`LAPORAN SHIFT ${document.getElementById("shift").value}\nTanggal: ${document.getElementById("tanggal").value}\nProduk: ${document.getElementById("produk").value}`;
-    isi+=narasi(2);
-    isi+=narasi(3);
-    if(n("pulp203") || document.getElementById("catatan").value){
-      isi+=`\n\nCatatan Tambahan:\n`;
-      if(n("pulp203")) isi+=`- Pulp 203: ${n("pulp203")} set\n`;
-      if(document.getElementById("catatan").value) isi+=`- ${document.getElementById("catatan").value}\n`;
-    }
-    document.getElementById("output").innerText=isi;
-    updateOEE(2); updateOEE(3);
-  }
-
-  function copyText(){let t=document.getElementById('output').innerText; if(!t.trim()){alert('Laporan kosong!'); return;} navigator.clipboard.writeText(t).then(()=>alert('📋 Laporan disalin ke clipboard'))}
-  function shareWA(){let t=document.getElementById('output').innerText||''; if(!t.trim()){previewLaporan(); t=document.getElementById('output').innerText;} window.open(`https://wa.me/?text=${encodeURIComponent(t)}`,'_blank')}
-  function clearData(){if(!confirm('Hapus semua data di form?'))return; document.querySelectorAll('input,textarea,select').forEach(el=>el.value=''); document.getElementById('output').innerText=''}
-  function toggleTheme(){document.body.classList.toggle('dark')}
-
-  // Server save/delete
-  function saveToServer(){
-    let data={};
-    document.querySelectorAll("input,textarea,select").forEach(el=>{data[el.id]=el.value});
-    fetch("save_laporan.php",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(data)
-    })
-    .then(r=>r.text())
-    .then(res=>alert("✅ "+res))
-    .catch(err=>alert("❌ Gagal simpan: "+err));
-  }
-
-  function hapusLaporan(){
-    let user = prompt("Masukkan Username:");
-    let pass = prompt("Masukkan Password:");
-    if(user!=="Tirta"||pass!=="Komunitas"){alert("❌ Username/Password salah!"); return;}
-    let tanggal=document.getElementById("tanggal").value;
-    if(!tanggal){alert("⚠️ Tanggal wajib diisi!"); return;}
-    fetch("delete_laporan.php",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({tanggal})
-    })
-    .then(r=>r.text())
-    .then(res=>alert("🗑 "+res))
-    .catch(err=>alert("❌ Gagal hapus: "+err));
-  }
+  });
+}
+function copyText(){
+  let t=document.getElementById("output").innerText;
+  if(!t.trim()){alert("Laporan kosong!");return;}
+  navigator.clipboard.writeText(t).then(()=>alert("Disalin"));
+}
 </script>
 </body>
 </html>
