@@ -65,7 +65,7 @@
       </div>
     </div>
 
-    <!-- Contoh LINE 2 -->
+    <!-- LINE 2 -->
     <div class="card">
       <h3>LINE 2</h3>
       <div class="grid-3">
@@ -82,7 +82,7 @@
         <div><label>Total Berat FG (kg)</label><input type="number" id="fg2"></div>
       </div>
       <div class="grid-2">
-        <div><label>Jumlah MR (Slitting)</label><input type="number" id="slit_total2"><div class="hint">Total bobin slitting</div></div>
+        <div><label>Jumlah MR (Slitting)</label><input type="number" id="slit_mr2"><div class="hint">1 MR = 6 bobin</div></div>
         <div><label>Bobin Reject Produksi (pcs)</label><input type="number" id="reject_produksi2"></div>
         <div><label>Bobin Reject NCP (pcs)</label><input type="number" id="reject_ncp2"></div>
       </div>
@@ -109,7 +109,7 @@
         <div><label>Total Berat FG (kg)</label><input type="number" id="fg3"></div>
       </div>
       <div class="grid-2">
-        <div><label>Jumlah MR (Slitting)</label><input type="number" id="slit_total3"><div class="hint">Total bobin slitting</div></div>
+        <div><label>Jumlah MR (Slitting)</label><input type="number" id="slit_mr3"><div class="hint">1 MR = 6 bobin</div></div>
         <div><label>Bobin Reject Produksi (pcs)</label><input type="number" id="reject_produksi3"></div>
         <div><label>Bobin Reject NCP (pcs)</label><input type="number" id="reject_ncp3"></div>
       </div>
@@ -142,51 +142,63 @@
 
 <script>
   const nf = new Intl.NumberFormat('id-ID',{maximumFractionDigits:2});
-
   function n(id){return parseFloat(document.getElementById(id)?.value||0)}
 
   function calcOEE(total, rejectP, rejectN){
     if(total<=0) return 0;
     let good = Math.max(total - rejectP - rejectN,0);
-    let quality = good/total;
-    let availability = 1;
-    let performance = 1;
-    return availability*performance*quality*100;
+    return (good/total)*100; // Avail & Perf dianggap 100%
   }
 
   function updateOEE(line){
-    let total = n(`slit_total${line}`);
+    let total = n(`slit_mr${line}`)*6;
     let rp = n(`reject_produksi${line}`);
     let rn = n(`reject_ncp${line}`);
     let oee = calcOEE(total,rp,rn);
-    document.getElementById(`oee${line}`).textContent = nf.format(oee)+"%";
+    document.getElementById(`oee${line}`).textContent = oee? nf.format(oee)+"%":"-";
     document.getElementById(`bar${line}`).style.width = Math.min(oee,100)+"%";
   }
 
   function narasi(line){
-    let t = `\n\n---\n\nLINE ${line}\n\nPersiapan Produksi:\n`;
-    if(n(`pulp205_${line}`)||n(`pulp204_${line}`)) t+=`- Pulp Tank: ${n(`pulp205_${line}`)||n(`pulp204_${line}`)} set\n`;
-    if(n(`vit${line}a`)) t+=`- Vitacel A: ${n(`vit${line}a`)} set\n`;
-    if(n(`vit${line}b`)) t+=`- Vitacel B: ${n(`vit${line}b`)} set\n`;
-    if(n(`vit${line}s`)) t+=`- Vitacel Standby: ${n(`vit${line}s`)} set\n`;
-    if(n(`adh${line}s`)) t+=`- Adhesive Standby: ${n(`adh${line}s`)} set\n`;
-    if(n(`adh${line}t`)) t+=`- Adhesive Tangki: ${n(`adh${line}t`)} set\n`;
-    if(n(`cmc${line}`)) t+=`- CMC: ${n(`cmc${line}`)} set\n`;
-    if(n(`rec${line}`)&&n(`rec${line}w`)) t+=`- Recycle: ${n(`rec${line}`)} set (${n(`rec${line}w`)} kg/set)\n`;
-    t+=`\nFinish Good:\n`;
-    if(n(`mr${line}`)) t+=`- Mother Roll: ${n(`mr${line}`)} MR\n`;
-    if(n(`fg${line}`)) t+=`- Berat FG: ${n(`fg${line}`)} kg\n`;
+    let parts=[];
+    if(n(`pulp205_${line}`)||n(`pulp204_${line}`)) parts.push(`- Pulp Tank: ${n(`pulp205_${line}`)||n(`pulp204_${line}`)} set`);
+    if(n(`vit${line}a`)) parts.push(`- Vitacel A: ${n(`vit${line}a`)} set`);
+    if(n(`vit${line}b`)) parts.push(`- Vitacel B: ${n(`vit${line}b`)} set`);
+    if(n(`vit${line}s`)) parts.push(`- Vitacel Standby: ${n(`vit${line}s`)} set`);
+    if(n(`adh${line}s`)) parts.push(`- Adhesive Standby: ${n(`adh${line}s`)} set`);
+    if(n(`adh${line}t`)) parts.push(`- Adhesive Tangki: ${n(`adh${line}t`)} set`);
+    if(n(`cmc${line}`)) parts.push(`- CMC: ${n(`cmc${line}`)} set`);
+    if(n(`rec${line}`)&&n(`rec${line}w`)) parts.push(`- Recycle: ${n(`rec${line}`)} set (${n(`rec${line}w`)} kg/set)`);
 
-    const total=n(`slit_total${line}`), rp=n(`reject_produksi${line}`), rn=n(`reject_ncp${line}`);
-    let good = Math.max(total-rp-rn,0);
-    t+=`\nSlitting:\n- Slitting: ${total} bobin\n- Reject Produksi: ${rp} bobin\n- Reject NCP: ${rn} bobin\n- OKE: ${good} bobin (${good*15} kg)\n`;
-    t+=`\n📈 OEE: ${nf.format(calcOEE(total,rp,rn))}%\n`;
-    return t;
+    let fg=[];
+    if(n(`mr${line}`)) fg.push(`- Mother Roll: ${n(`mr${line}`)} MR`);
+    if(n(`fg${line}`)) fg.push(`- Berat FG: ${n(`fg${line}`)} kg`);
+
+    let total=n(`slit_mr${line}`)*6, rp=n(`reject_produksi${line}`), rn=n(`reject_ncp${line}`);
+    let slitting=[];
+    if(total||rp||rn){
+      let good=Math.max(total-rp-rn,0);
+      slitting.push(`- Slitting: ${total} bobin`);
+      if(rp) slitting.push(`- Reject Produksi: ${rp} bobin`);
+      if(rn) slitting.push(`- Reject NCP: ${rn} bobin`);
+      slitting.push(`- OKE: ${good} bobin (${good*15} kg)`);
+      slitting.push(`📈 OEE: ${nf.format(calcOEE(total,rp,rn))}%`);
+    }
+
+    if(parts.length||fg.length||slitting.length){
+      let text=`\n\n---\n\nLINE ${line}\n`;
+      if(parts.length){text+=`\nPersiapan Produksi:\n${parts.join("\n")}\n`;}
+      if(fg.length){text+=`\nFinish Good:\n${fg.join("\n")}\n`;}
+      if(slitting.length){text+=`\nSlitting:\n${slitting.join("\n")}\n`;}
+      return text;
+    }
+    return "";
   }
 
   function previewLaporan(){
-    let isi = `LAPORAN SHIFT ${document.getElementById("shift").value}\nTanggal: ${document.getElementById("tanggal").value}\nProduk: ${document.getElementById("produk").value}`;
-    isi+=narasi(2); isi+=narasi(3);
+    let isi=`LAPORAN SHIFT ${document.getElementById("shift").value}\nTanggal: ${document.getElementById("tanggal").value}\nProduk: ${document.getElementById("produk").value}`;
+    isi+=narasi(2);
+    isi+=narasi(3);
     if(n("pulp203") || document.getElementById("catatan").value){
       isi+=`\n\nCatatan Tambahan:\n`;
       if(n("pulp203")) isi+=`- Pulp 203: ${n("pulp203")} set\n`;
@@ -199,7 +211,6 @@
   function copyText(){let t=document.getElementById('output').innerText; if(!t.trim()){alert('Laporan kosong!'); return;} navigator.clipboard.writeText(t).then(()=>alert('📋 Laporan disalin ke clipboard'))}
   function shareWA(){let t=document.getElementById('output').innerText||''; if(!t.trim()){previewLaporan(); t=document.getElementById('output').innerText;} window.open(`https://wa.me/?text=${encodeURIComponent(t)}`,'_blank')}
   function clearData(){if(!confirm('Hapus semua data di form?'))return; document.querySelectorAll('input,textarea,select').forEach(el=>el.value=''); document.getElementById('output').innerText=''}
-
   function toggleTheme(){document.body.classList.toggle('dark')}
 
   // Server save/delete
